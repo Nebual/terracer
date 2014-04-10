@@ -185,19 +185,19 @@ int Entity::ContainsPoint(double x, double y) {
 }
 
 Entity* Entity::CollisionMovement(Direction &collideDir, double dt) {
-	static Vector points[8] = {
-		{(double) this->rect.w/4, 0}, 			  {(double) this->rect.w * (3.0d/4), 0},
-		{(double) this->rect.w/4, (double) this->rect.h}, {(double) this->rect.w * (3.0d/4), (double) this->rect.h},
-		{0, (double) this->rect.h/4}, 			  {0, (double) this->rect.h * (3.0d/4)},
-		{(double) this->rect.w, (double) this->rect.h/4}, {(double) this->rect.w, (double) this->rect.h * (3.0d/4)}
+	static Vector points[9] = {
+		{(double) this->rect.w/2, 0}, // Top (1 point)
+		{(double) this->rect.w/4, (double) this->rect.h}, {(double) this->rect.w * (3.0d/4), (double) this->rect.h}, // Bottom (2 points)
+		{0, (double) this->rect.h/4}, {0, (double) this->rect.h/2}, {0, (double) this->rect.h * (3.0d/4)}, // Left (3 points)
+		{(double) this->rect.w, (double) this->rect.h/4}, {(double) this->rect.w, (double) this->rect.h/2}, {(double) this->rect.w, (double) this->rect.h * (3.0d/4)} // Right (3 points)
 	};
 	
-	double originalMoveX, originalMoveY, projectedMoveX, projectedMoveY, nextMoveX, nextMoveY;
+	double originalMoveX, originalMoveY, nextMoveX, nextMoveY;
 	originalMoveX = nextMoveX = this->vel.x * dt;
 	originalMoveY = nextMoveY = this->vel.y * dt;
 
 	Entity* hit;
-	for (int enti = 0; enti < entsC && !collideDir; enti++) {
+	for (int enti = 0; enti < entsC; enti++) {
 		if(ents[enti] == NULL || ents[enti]->collision == 0 || this == ents[enti]) continue;
 		// Test the four possible directions of player movement individually (0 = top, 1 = bottom, 2 = left, 3 = right)
 		for (int dir = 0; dir < 4; dir++) {
@@ -207,25 +207,33 @@ Entity* Entity::CollisionMovement(Direction &collideDir, double dt) {
 			if (dir == 2 && nextMoveX > 0) continue; // Moving Right
 			if (dir == 3 && nextMoveX < 0) continue; // Moving Left
 
-			projectedMoveX = (dir >= 2 ? nextMoveX : 0);
-			projectedMoveY = (dir <  2 ? nextMoveY : 0);
-
 			// Traverse backwards in X or Y (but not both at the same time)
 			// until the player is no longer colliding with the geometry
 			// Note: This code also enables walking up gently sloping surfaces:
 			// as the force of gravity pulls down on the player and causes surface contact,
 			// the correction pushes the player away from the inside of the platform up to the surface.
-			while (ents[enti]->ContainsPoint(points[dir*2].x + this->pos.x + projectedMoveX, points[dir*2].y + this->pos.y + projectedMoveY)
-				|| ents[enti]->ContainsPoint(points[dir*2+1].x + this->pos.x + projectedMoveX, points[dir*2+1].y + this->pos.y + projectedMoveY)) {
-				if 	(dir == 0) projectedMoveY++;
-				else if (dir == 1) projectedMoveY--;
-				else if (dir == 2) projectedMoveX++;
-				else if (dir == 3) projectedMoveX--;
-				hit = ents[enti];
+			if(dir == 0) {
+				while (ents[enti]->ContainsPoint(points[0].x + this->pos.x, points[0].y + this->pos.y + nextMoveY)) {
+					nextMoveY++;
+				}
+			} else if (dir == 1) {
+				while (ents[enti]->ContainsPoint(points[1].x + this->pos.x, points[1].y + this->pos.y + nextMoveY)
+					|| ents[enti]->ContainsPoint(points[2].x + this->pos.x, points[2].y + this->pos.y + nextMoveY)) {
+					nextMoveY--;
+				}
+			} else if (dir == 2) {
+				while (ents[enti]->ContainsPoint(points[3].x + this->pos.x + nextMoveX, points[3].y + this->pos.y)
+					|| ents[enti]->ContainsPoint(points[4].x + this->pos.x + nextMoveX, points[4].y + this->pos.y)
+					|| ents[enti]->ContainsPoint(points[5].x + this->pos.x + nextMoveX, points[5].y + this->pos.y)) {
+					nextMoveX++;
+				}
+			} else if (dir == 3) {
+				while (ents[enti]->ContainsPoint(points[6].x + this->pos.x + nextMoveX, points[6].y + this->pos.y)
+					|| ents[enti]->ContainsPoint(points[7].x + this->pos.x + nextMoveX, points[7].y + this->pos.y)
+					|| ents[enti]->ContainsPoint(points[8].x + this->pos.x + nextMoveX, points[8].y + this->pos.y)) {
+					nextMoveX--;
+				}
 			}
-
-			if 	(dir >= 2) nextMoveX = projectedMoveX;
-			else if (dir <  2) nextMoveY = projectedMoveY;
 		}
 
 		// Detect what type of contact has occurred based on a comparison of
@@ -241,6 +249,10 @@ Entity* Entity::CollisionMovement(Direction &collideDir, double dt) {
 		}
 		else if (nextMoveX < originalMoveX && originalMoveX > 0) {
 			collideDir = collideDir | LEFT;
+		}
+		if(collideDir) { // If we hit anything at all
+			hit = ents[enti];
+			break;
 		}
 	}
 
