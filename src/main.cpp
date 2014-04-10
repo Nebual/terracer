@@ -40,7 +40,7 @@ int main(int argc, char *argv[]) {
 
 	generateLevel(FIRSTLEVEL);
 	
-	ply = new Entity(TextureDataCreate("res/plank.png"), TYPE_PLAYER, WIDTH/2 - 50, HEIGHT - 36);
+	ply = new Entity(TextureDataCreate("res/player.png"), TYPE_PLAYER, WIDTH/2 - 50, 180);
 	
 	int lastFrame = curtime_u() - 1;
 	double dt;
@@ -51,6 +51,7 @@ int main(int argc, char *argv[]) {
 		int curFrame = curtime_u();
 		if(lastFrame > curFrame) {dt = ((1000000 - lastFrame) + curFrame) / 1000000.0;}
 		else {dt = (curFrame - lastFrame) / 1000000.0;}
+		if(dt > 0.1) {dt = 0.1;} // Clamp dt so objects don't have collision issues
 		lastFrame = curFrame;
 
 		// ===================

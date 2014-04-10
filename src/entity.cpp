@@ -14,6 +14,9 @@
 #include "entity.h"
 #include "main.h"
 #include "level.h"
+#include "input.h"
+
+const int MAX_COLLISION_ITERATIONS = 3;
 
 TextureData ballTD;
 TextureData blockTDs[127];
@@ -187,7 +190,21 @@ void Entity::Update(double dt) {
 			
 			break;
 		} case TYPE_PLAYER:
+			if(abs(this->vel.y) > JUMP_THRESHOLD) {playerOnGround = 0;}
+			
+			Direction collideDir;
+			for (int i=0; i < MAX_COLLISION_ITERATIONS; i++) {
+				collideDir = (Direction) 0;
+				Entity *hit = this->CollisionMovement(collideDir, dt);
+				if(hit != NULL) {
+					if(collideDir & DOWN) playerOnGround = 1;
+				} else {
+					break;
+				}
+			}
 			this->Movement(dt);
+			
+			// Clamp movement to sides of level (for now)
 			if((this->pos.x + this->rect.w) > WIDTH) {
 				this->pos.x = WIDTH - this->rect.w;
 			}
@@ -217,6 +234,89 @@ Entity* Entity::TestCollision() {
 		//if(this->Distance(ents[i]) < (ents[i]->collisionSize + this->collisionSize)) {return ents[i];}
 	}
 	return NULL;
+}
+
+int Entity::ContainsPoint(double x, double y) {
+	return (x < (this->pos.x + this->rect.w) && 
+		x > this->pos.x &&
+		y < (this->pos.y + this->rect.h) &&
+		y > this->pos.y);
+}
+
+Entity* Entity::CollisionMovement(Direction &collideDir, double dt) {
+	static Vector points[8] = {
+		{(double) this->rect.w/4, 0}, 			  {(double) this->rect.w * (3.0d/4), 0},
+		{(double) this->rect.w/4, (double) this->rect.h}, {(double) this->rect.w * (3.0d/4), (double) this->rect.h},
+		{0, (double) this->rect.h/4}, 			  {0, (double) this->rect.h * (3.0d/4)},
+		{(double) this->rect.w, (double) this->rect.h/4}, {(double) this->rect.w, (double) this->rect.h * (3.0d/4)}
+	};
+	
+	double originalMoveX, originalMoveY, projectedMoveX, projectedMoveY, nextMoveX, nextMoveY;
+	originalMoveX = nextMoveX = this->vel.x * dt;
+	originalMoveY = nextMoveY = this->vel.y * dt;
+
+	Entity* hit;
+	for (int enti = 0; enti < entsC && !collideDir; enti++) {
+		if(ents[enti] == NULL || ents[enti]->collision == 0 || this == ents[enti]) continue;
+		// Test the four possible directions of player movement individually (0 = top, 1 = bottom, 2 = left, 3 = right)
+		for (int dir = 0; dir < 4; dir++) {
+			// Skip the test if the expected direction of movement makes the test irrelevant
+			if (dir == 0 && nextMoveY > 0) continue; // Moving Down
+			if (dir == 1 && nextMoveY < 0) continue; // Moving Up
+			if (dir == 2 && nextMoveX > 0) continue; // Moving Right
+			if (dir == 3 && nextMoveX < 0) continue; // Moving Left
+
+			projectedMoveX = (dir >= 2 ? nextMoveX : 0);
+			projectedMoveY = (dir <  2 ? nextMoveY : 0);
+
+			// Traverse backwards in X or Y (but not both at the same time)
+			// until the player is no longer colliding with the geometry
+			// Note: This code also enables walking up gently sloping surfaces:
+			// as the force of gravity pulls down on the player and causes surface contact,
+			// the correction pushes the player away from the inside of the platform up to the surface.
+			while (ents[enti]->ContainsPoint(points[dir*2].x + this->pos.x + projectedMoveX, points[dir*2].y + this->pos.y + projectedMoveY)
+				|| ents[enti]->ContainsPoint(points[dir*2+1].x + this->pos.x + projectedMoveX, points[dir*2+1].y + this->pos.y + projectedMoveY)) {
+				if 	(dir == 0) projectedMoveY++;
+				else if (dir == 1) projectedMoveY--;
+				else if (dir == 2) projectedMoveX++;
+				else if (dir == 3) projectedMoveX--;
+				hit = ents[enti];
+			}
+
+			if 	(dir >= 2) nextMoveX = projectedMoveX;
+			else if (dir <  2) nextMoveY = projectedMoveY;
+		}
+
+		// Detect what type of contact has occurred based on a comparison of
+		// the original expected movement vector and the new one
+		if (nextMoveY > originalMoveY && originalMoveY < 0) {
+			collideDir = collideDir | UP;
+		}
+		else if (nextMoveY < originalMoveY && originalMoveY > 0) {
+			collideDir = collideDir | DOWN;
+		}
+		if (nextMoveX > originalMoveX && originalMoveX < 0) {
+			collideDir = collideDir | RIGHT;
+		}
+		else if (nextMoveX < originalMoveX && originalMoveX > 0) {
+			collideDir = collideDir | LEFT;
+		}
+	}
+
+	// If a contact has been detected, apply the re-calculated movement vector
+	// and disable any further movement this frame (in either X or Y as appropriate)
+	if(collideDir) {
+		if (collideDir & (UP | DOWN)) { // ContactY +/-
+			this->pos.y += nextMoveY;
+			this->vel.y = 0;
+		}
+		if (collideDir >= 4) { // ContactX +/-
+			this->pos.x += nextMoveX;
+			this->vel.x = 0;
+		}
+	}
+	
+	return hit;
 }
 
 void Entity::Damage(int damage) {
@@ -249,3 +349,5 @@ void GenBall(Entity *ent){
 	ballInPlay->vel.y = -300;
 	balls--;
 }
+
+inline Direction operator|(Direction a, Direction b) {return static_cast<Direction>(static_cast<int>(a) | static_cast<int>(b));}

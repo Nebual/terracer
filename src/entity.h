@@ -32,6 +32,14 @@ typedef struct {
 	int h;
 } TextureData;
 
+enum Direction {
+	UP = 1,
+	DOWN = 2,
+	LEFT = 4,
+	RIGHT = 8
+};
+Direction operator|(Direction a, Direction b);
+
 struct Entity {
 	Vector vel;
 	Vector pos;
@@ -57,14 +65,15 @@ struct Entity {
 	void Update(double dt);
 	void Movement(double dt);
 	static void GC();
+	int ContainsPoint(double x, double y);
 	Entity* TestCollision();
+	Entity* CollisionMovement(Direction &dir, double dt);
 	void Damage(int damage);
 	void DeathClock(int delay);
 	double Distance(Entity *ent2);
 };
 
 extern TextureData blockTDs[127];
-
 
 void initTextures();
 TextureData TextureDataCreate(const char texturePath[]);

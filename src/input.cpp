@@ -8,11 +8,14 @@
 #include <SDL2/SDL_mixer.h>
 
 
-//#include "util.h"
+#include "util.h"
 #include "entity.h"
 #include "main.h"
 #include "input.h"
 #include "level.h"
+
+double jumping = 0;
+int playerOnGround = 0;
 
 void handleKeyboard(double dt, Entity *ply) {
 	static int keysPressed[255];
@@ -50,6 +53,13 @@ void handleKeyboard(double dt, Entity *ply) {
 							return;
 						}
 						break;
+					case SDLK_SPACE:
+						if(playerOnGround) {
+							jumping = 0.000000001;
+							ply->vel.y = -275;
+						}
+						break;
+				
 				}
 				break;
 			case SDL_KEYUP:
@@ -57,18 +67,40 @@ void handleKeyboard(double dt, Entity *ply) {
 				
 				switch(keyevent.key.keysym.sym) {
 					case SDLK_SPACE:
-						GenBall(ply);
+						jumping = 0;
 						break;
 				}
 		}
 	}
 	
-	ply->vel.x = 0;
+	if(playerOnGround) {
+		if(keysPressed[SDL_SCANCODE_A] || keysPressed[SDL_SCANCODE_LEFT]) {
+			ply->vel.x = -PLAYER_MAX_SPEED;
+		}
+		else if(keysPressed[SDL_SCANCODE_D] || keysPressed[SDL_SCANCODE_RIGHT]) {
+			ply->vel.x = PLAYER_MAX_SPEED;
+		}
+		else {
+			ply->vel.x = 0;
+		}
+	} else {
+		if(keysPressed[SDL_SCANCODE_A] || keysPressed[SDL_SCANCODE_LEFT]) {
+			ply->vel.x = max(ply->vel.x - PLAYER_AIR_ACCEL*dt, -PLAYER_MAX_SPEED);
+		}
+		else if(keysPressed[SDL_SCANCODE_D] || keysPressed[SDL_SCANCODE_RIGHT]) {
+			ply->vel.x = min(ply->vel.x + PLAYER_AIR_ACCEL*dt, PLAYER_MAX_SPEED);
+		}
+		else {
+			ply->vel.x -= sign(ply->vel.x) * PLAYER_AIR_ACCEL/2*dt;
+		}
+	}
 	
-	if(keysPressed[SDL_SCANCODE_A] || keysPressed[SDL_SCANCODE_LEFT]) {
-		ply->vel.x = -300;
+	if(jumping) {
+		jumping += dt;
+		ply->vel.y -= GRAVITY_ACCEL*dt * (PLAYER_JUMP_TIME - jumping/2)/PLAYER_JUMP_TIME;
+		if(jumping > PLAYER_JUMP_TIME) {
+			jumping = 0;
+		}
 	}
-	else if(keysPressed[SDL_SCANCODE_D] || keysPressed[SDL_SCANCODE_RIGHT]) {
-		ply->vel.x = 300;
-	}
+	ply->vel.y += GRAVITY_ACCEL*dt;
 }
