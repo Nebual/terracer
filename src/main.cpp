@@ -93,10 +93,8 @@ int main(int argc, char *argv[]) {
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 	
- 	#ifndef __arm__
 	Mix_CloseAudio();
 	Mix_Quit();
-	#endif
 
 	IMG_Quit();
 	SDL_Quit();
@@ -123,7 +121,6 @@ int initWindow(SDL_Window **window, SDL_Renderer **renderer, int argc, char *arg
 		return 1;
 	}
 
-	#ifndef __arm__
 	if(Mix_OpenAudio( MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 2, 1024 ) == -1) {
 		fprintf(stderr, "Audio Init failed: %s\n", Mix_GetError());
 		return 1;
@@ -133,7 +130,6 @@ int initWindow(SDL_Window **window, SDL_Renderer **renderer, int argc, char *arg
 		fprintf(stderr, "Audio Init2 failed: %s\n", Mix_GetError());
 		return 1;
 	}
-	#endif
 	
 	if(TTF_Init()==-1) {
 		printf("TTF_Init: %s\n", TTF_GetError());

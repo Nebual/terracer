@@ -68,9 +68,7 @@ int random_range(int min, int max){
 }
 
 void playSound(Mix_Chunk *snd) {
-	#ifndef __arm__
 	if(snd == NULL || Mix_PlayChannel(-1, snd, 0 ) == -1) {printf("Snd loading error: %s\n", Mix_GetError());}
-	#endif
 }
 
 void displayText(int x, int y, const char text[], SDL_Color color){
