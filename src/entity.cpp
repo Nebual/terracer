@@ -251,7 +251,7 @@ Entity* Entity::CollisionMovement(Direction &collideDir, double dt) {
 			this->pos.y += nextMoveY;
 			this->vel.y = 0;
 		}
-		if (collideDir >= 4) { // ContactX +/-
+		if (collideDir & (LEFT | RIGHT)) { // ContactX +/-
 			this->pos.x += nextMoveX;
 			this->vel.x = 0;
 		}
