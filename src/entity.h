@@ -17,9 +17,6 @@ typedef enum {
 typedef enum {
 	BLOCK_NONE = ' ',
 	BLOCK_NORMAL = '=',
-	BLOCK_SPEEDUP = '+',
-	BLOCK_SLOWDOWN = '-',
-	BLOCK_RANDOM = 'X',
 	BLOCK_TOUGH = '#'
 } BlockType;
 
@@ -77,7 +74,6 @@ extern TextureData blockTDs[127];
 
 void initTextures();
 TextureData TextureDataCreate(const char texturePath[]);
-void GenBall(Entity *ent);
 
 
 #endif

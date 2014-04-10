@@ -27,9 +27,6 @@ static Mix_Chunk *failSound;
 void initTextures() {
 	ballTD = TextureDataCreate("res/ball.png");
 	blockTDs[BLOCK_NORMAL] = TextureDataCreate("res/block.png");
-	blockTDs[BLOCK_SPEEDUP] = TextureDataCreate("res/block_speedup.png");
-	blockTDs[BLOCK_SLOWDOWN] = TextureDataCreate("res/block_slowdown.png");
-	blockTDs[BLOCK_RANDOM] = TextureDataCreate("res/block_random.png");
 	blockTDs[BLOCK_TOUGH] = TextureDataCreate("res/block_tough.png");
 
 	explosionTD.texture = IMG_LoadTexture(renderer, "res/explosion_50.png");
@@ -77,10 +74,6 @@ Entity::Entity(TextureData texdata, Type type, int x, int y) {
 		case TYPE_BLOCK:
 			this->collision = 1;
 			this->health = 100;
-			break;
-		case TYPE_BALL:
-			this->collision = 1;
-			this->damage = 100;
 			break;
 	}
 	
@@ -138,58 +131,7 @@ void Entity::Update(double dt) {
 		return;
 	}
 	switch(this->type) {
-		case TYPE_BALL: {
-			this->Movement(dt);
-			
-			if((this->pos.x + this->rect.w) > WIDTH) {
-				if(this->vel.x > 0) {
-					this->vel.x *= -1;
-				}
-			} else if(this->pos.x < 0) {
-				if(this->vel.x < 0) {
-					this->vel.x *= -1;
-				}
-			}
-			if((this->pos.y + this->rect.h) > HEIGHT) {
-				ballInPlay = NULL;
-				playSound(failSound);
-				delete this;
-				return;
-			} else if (this->pos.y < 0){
-				if(this->vel.y < 0){
-					this->vel.y *= -1;
-				}
-			}
-			
-			Entity *hit = this->TestCollision();
-			if(hit != NULL) {
-				if(DEBUG) printf("Collision Occured: PosX %.3f, PosY: %.3f, Block (%.2f, %.2f), CollisionSizes (%d, %d), distance: %.2f\n", this->pos.x, this->pos.y, hit->pos.x, hit->pos.y, this->collisionSize, hit->collisionSize, this->Distance(hit));
-				this->vel.y = abs(this->vel.y) * sign(this->pos.y - hit->pos.y);
-				
-				if(hit->type == TYPE_PLAYER){
-					this->vel.x += hit->vel.x * 0.25;
-					playSound(bounceSound);
-				} else if(hit->type == TYPE_BLOCK) {
-					playSound(hitSounds[rand() % 3]);
-					switch(hit->blockType) {
-						case BLOCK_SPEEDUP: 
-							this->vel.x *= 1.25;
-							this->vel.y *= 1.1;
-							break;
-						case BLOCK_SLOWDOWN: 
-							this->vel.x /= 1.25;
-							this->vel.y /= 1.1;
-							break;
-						case BLOCK_RANDOM:
-							this->vel.x = this->vel.x * 0.5 + random_range(-250, 250);
-							break;
-					}
-				}
-				hit->Damage(this->damage);
-			}
-			
-			break;
-		} case TYPE_PLAYER:
+		case TYPE_PLAYER:
 			if(abs(this->vel.y) > JUMP_THRESHOLD) {playerOnGround = 0;}
 			
 			Direction collideDir;
@@ -221,7 +163,6 @@ void Entity::Movement(double dt) {
 Entity* Entity::TestCollision() {
 	for(int i=0; i<entsC; i++) {
 		if(ents[i] == NULL || ents[i]->collision == 0 || this == ents[i]) continue;
-		if(ents[i]->type == TYPE_BALL) continue;
 		
 		// Rect collisions
 		double maxX = max(ents[i]->pos.x, this->pos.x);
@@ -340,14 +281,6 @@ void Entity::DeathClock(int delay) {
 
 double Entity::Distance(Entity *ent2) {
 	return pow(pow(this->rect.x - ent2->rect.x, 2) + powf(this->rect.y - ent2->rect.y, 2), 0.5);
-}
-
-void GenBall(Entity *ent){
-	if(ballInPlay != NULL || balls <= 0) return;
-	ballInPlay = new Entity(ballTD, TYPE_BALL, ent->pos.x, (ent->pos.y - 50));
-	ballInPlay->vel.x = random_range(-150, 150);
-	ballInPlay->vel.y = -300;
-	balls--;
 }
 
 inline Direction operator|(Direction a, Direction b) {return static_cast<Direction>(static_cast<int>(a) | static_cast<int>(b));}
