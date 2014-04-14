@@ -7,6 +7,7 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_mixer.h>
 #include <SDL2/SDL_ttf.h>
+#include "json/json.h"
 
 #include "entity.h"
 #include "main.h"
@@ -32,6 +33,8 @@ void generateLevel(int level) {
 		}
 	}
 	Entity::GC();
+
+	loadJSONLevel(level);
 	
 	curLevel = level;
 	char filename[14] = "";
@@ -62,6 +65,12 @@ void generateLevel(int level) {
 		}
 		memset(line, '\0', sizeof(line));
 	}
+}
+
+void loadJSONLevel(int level) {
+	Json::Value root;   // will contains the root value after parsing.
+	Json::Reader reader;
+	bool parsingSuccessful = reader.parse( "{\"hi\": 5}", root );
 }
 
 void drawBackground(SDL_Renderer *renderer, double dt) {

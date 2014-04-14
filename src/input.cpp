@@ -28,7 +28,6 @@ void handleKeyboard(double dt, Entity *ply) {
 				return;
 			case SDL_KEYDOWN:
 				keysPressed[keyevent.key.keysym.scancode] = 1;
-				if(DEBUG) printf("Key pressed: %d\n", keyevent.key.keysym.scancode);
 				
 				switch(keyevent.key.keysym.sym) {
 					case SDLK_c:
