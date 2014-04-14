@@ -17,6 +17,7 @@
 #include "input.h"
 
 const int MAX_COLLISION_ITERATIONS = 3;
+const int INTERACT_DIST = 50;
 
 TextureData ballTD;
 TextureData blockTDs[127];
@@ -67,6 +68,7 @@ Entity::Entity(TextureData texdata, Type type, int x, int y) {
 	this->animTime = 0;
 	this->animDuration = 0;
 	this->animMaxFrames = 0;
+	this->action = NO_ACTION;
 	switch(type) {
 		case TYPE_PLAYER:
 			this->collision = 1;
@@ -293,6 +295,37 @@ void Entity::DeathClock(int delay) {
 
 double Entity::Distance(Entity *ent2) {
 	return pow(pow(this->rect.x - ent2->rect.x, 2) + powf(this->rect.y - ent2->rect.y, 2), 0.5);
+}
+
+void Entity::use(){
+	if(DEBUG){printf("Action executed: %d\n", action);}	
+	switch(action){
+		case PLY_HEALTH_UP:
+			ply->health += 25;
+			break;
+	}
+}
+
+Entity* Entity::closestInteractable(int minDist) {
+	Entity *closest = NULL;
+	int dist = minDist;
+	for(int i=0; i<entsC; i++) {
+		if(ents[i] == NULL || this == ents[i] || ents[i]->action == NO_ACTION) {continue;}
+
+		if(this->Distance(ents[i]) < dist) {
+			dist = this->Distance(ents[i]);
+			closest = ents[i];
+		}
+	}
+	
+	return closest;
+}
+
+void Entity::interact() {
+	Entity *closest = closestInteractable(INTERACT_DIST);
+	if(closest == NULL) {return;}
+	if(closest->action == NO_ACTION) {return;}
+	closest->use();
 }
 
 inline Direction operator|(Direction a, Direction b) {return static_cast<Direction>(static_cast<int>(a) | static_cast<int>(b));}

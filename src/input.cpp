@@ -57,8 +57,7 @@ void handleKeyboard(double dt, Entity *ply) {
 							jumping = 0.000000001;
 							ply->vel.y = -275;
 						}
-						break;
-				
+						break;				
 				}
 				break;
 			case SDL_KEYUP:
@@ -68,6 +67,9 @@ void handleKeyboard(double dt, Entity *ply) {
 					case SDLK_SPACE:
 						jumping = 0;
 						break;
+					case SDLK_e:
+						ply->interact();
+						break;	
 				}
 		}
 	}

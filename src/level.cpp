@@ -65,6 +65,8 @@ void generateLevel(int level) {
 		}
 		memset(line, '\0', sizeof(line));
 	}
+	Entity *testInteract = new Entity(blockTDs[BLOCK_TOUGH], TYPE_BLOCK, 400, 200);
+	testInteract->action = PLY_HEALTH_UP;
 }
 
 void loadJSONLevel(int level) {

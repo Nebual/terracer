@@ -35,6 +35,14 @@ enum Direction {
 	LEFT = 4,
 	RIGHT = 8
 };
+
+enum Action {
+	NO_ACTION,
+	PLY_HEALTH_UP,
+	PLY_SPEED_UP,
+	PLY_LIVES_UP
+};
+
 Direction operator|(Direction a, Direction b);
 
 struct Entity {
@@ -56,6 +64,8 @@ struct Entity {
 	Type type;
 	BlockType blockType;
 	
+	Action action;
+	
 	Entity (TextureData texdata, Type type, int x, int y);
 	~Entity ();
 	void Draw(double dt);
@@ -68,11 +78,15 @@ struct Entity {
 	void Damage(int damage);
 	void DeathClock(int delay);
 	double Distance(Entity *ent2);
+	void use();
+	Entity* closestInteractable(int dist);
+	void interact();
 };
 
 extern TextureData blockTDs[127];
 
 void initTextures();
+
 TextureData TextureDataCreate(const char texturePath[]);
 
 
