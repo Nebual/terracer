@@ -1,14 +1,13 @@
 EXECUTABLE=terracer
-EXTRAHEADERS=
 EXTRALIBS=-lSDL2_image -lm -lSDL2_ttf -lSDL2_mixer
 
 #SOURCES=src/main.c $(wildcard src/*.c)
-#SOURCES=src/entity.c src/input.c src/main.c src/system.c src/util.c src/hud.c
-SOURCES=src/entity.cpp src/input.cpp src/main.cpp src/level.cpp src/util.cpp
+SOURCES=entity.cpp input.cpp main.cpp level.cpp util.cpp
+EXTERNALSOURCES=jsoncpp.cpp
 
-F=main
 CC=g++
 C99MODE=-std=c++0x
+EXTRACFLAGS=-g $(C99MODE)
 
 debug: EXTRACFLAGS +=-DDEBUG -g
 warn: EXTRACFLAGS += -Wall
@@ -16,7 +15,7 @@ warn: EXTRACFLAGS += -Wall
 # Targetting Windows x64
 win32: CC:=x86_64-w64-mingw32-$(CC)
 win32: EXECUTABLE:=$(EXECUTABLE).exe
-win32: CFLAGS=-I$(WINFOLDER)include/SDL2 -Dmain=SDL_main $(C99MODE) $(EXTRACFLAGS)
+win32: CFLAGS=-I$(WINFOLDER)include/SDL2 -Dmain=SDL_main
 win32: LIBS=-L$(WINFOLDER)lib -lmingw32 -lSDL2main -lSDL2 $(EXTRALIBS)
 
 
@@ -32,7 +31,7 @@ run: win32
 else
 # Building on Linux
 WINFOLDER:=/usr/x86_64-w64-mingw32/
-CFLAGS=$(shell sdl2-config --cflags) $(C99MODE) $(EXTRACFLAGS)
+CFLAGS=$(shell sdl2-config --cflags)
 LIBS=$(shell sdl2-config --libs) $(EXTRALIBS)
 
 all: compile
@@ -42,11 +41,37 @@ win32: all
 run: all
 	@echo
 	./$(EXECUTABLE) --software
+gdb: debug
+	gdb --eval-command=run --args ./$(EXECUTABLE) --software
+endif
+
+CFLAGS+=$(EXTRACFLAGS) -Iexternals/include
+OBJECTS=$(patsubst %.cpp,build/%.o, $(SOURCES))
+EXTERNALOBJECTS=$(patsubst %.cpp,externals/build/%.o, $(EXTERNALSOURCES))
+
+
+warn: all
+ifeq ($(MAKECMDGOALS),debug)
+debug: clean run clean2
+else
+debug: clean all clean2
 endif
 
 
-debug: run
-warn: all
+$(OBJECTS): build/%.o : src/%.cpp
+	$(CC) $(CFLAGS) -o $@ -c $<
+$(EXTERNALOBJECTS): externals/build/%.o : externals/src/%.cpp
+	$(CC) -Iexternals/include -o $@ -c $<
+clean:
+	-rm build/*.o
+clean2: #A second one so we can execute clean twice
+	-rm build/*.o
+
+compile: $(OBJECTS) $(EXTERNALOBJECTS)
+	@echo
+	@echo Linking...
+	$(CC) $(CFLAGS) -o $(EXECUTABLE) $(OBJECTS) $(EXTERNALOBJECTS) $(LIBS)
+
 
 zip: win32
 	zip -r -u $(EXECUTABLE).zip $(EXECUTABLE).exe $(EXECUTABLE).bat $(EXECUTABLE)_update.exe Makefile res src levels *.dll README.md
@@ -56,12 +81,8 @@ zipall: all
 	zip -u $(EXECUTABLE)_all.zip sdl.zip
 	upload $(EXECUTABLE)_all.zip
 
-compile: 
-	@echo
-	$(CC) -g $(CFLAGS) -o $(EXECUTABLE) $(SOURCES) $(LIBS)
-headers:
-	makeheaders $(EXTRAHEADERS) $(SOURCES)
 
+F=main
 asm:
 	$(CC) $(CFLAGS) -o $(EXECUTABLE).asm -S src/$(F).c $(LIBS)
 	meld $(EXECUTABLE).asm $(EXECUTABLE)_2.asm
