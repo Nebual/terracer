@@ -19,8 +19,7 @@ SDL_Renderer *renderer;
 Entity *ents[512];
 int entsC = 0;
 
-int WIDTH;
-int HEIGHT;
+int WIDTH, HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, WIDTH_OFFSET, HEIGHT_OFFSET;
 int FIRSTLEVEL = 1;
 Entity *ply;
 int quit = 0;
@@ -107,13 +106,6 @@ int initWindow(SDL_Window **window, SDL_Renderer **renderer, int argc, char *arg
 		fprintf(stderr, "SDL Init failed: %s\n", SDL_GetError());
 		return 1;
 	}
-
-	/*SDL_DisplayMode displayInfo;
-	SDL_GetCurrentDisplayMode(0, &displayInfo); 
-	WIDTH = displayInfo.w;
-	HEIGHT = displayInfo.h;*/
-	WIDTH = 800;
-	HEIGHT = 600;
 	
 	int flags=IMG_INIT_JPG|IMG_INIT_PNG;
 	if(IMG_Init(flags) != flags) {
@@ -135,13 +127,18 @@ int initWindow(SDL_Window **window, SDL_Renderer **renderer, int argc, char *arg
 		printf("TTF_Init: %s\n", TTF_GetError());
 		return 1;
 	}
+	
+	WIDTH = 800;
+	HEIGHT = 600;
 
 	int useSoftwareAccel = 0;
+	int useFullscreen = 0;
 	int optionIndex = 0;
 	int c;
 	struct option longOptions[] = {
 		{"software", no_argument, &useSoftwareAccel, 1},
 		{"hardware", no_argument, &useSoftwareAccel, 0},
+		{"fullscreen", no_argument, &useFullscreen, 1},
 		{"level", required_argument, 0, 'l'}
 	};
 
@@ -152,6 +149,18 @@ int initWindow(SDL_Window **window, SDL_Renderer **renderer, int argc, char *arg
 				break;
 		}
 	}
+
+	if(useFullscreen) {
+		SDL_DisplayMode displayInfo;
+		SDL_GetCurrentDisplayMode(0, &displayInfo); 
+		WINDOW_WIDTH = displayInfo.w;
+		WINDOW_HEIGHT = displayInfo.h;
+	} else {
+		WINDOW_WIDTH = WIDTH;
+		WINDOW_HEIGHT = HEIGHT;
+	}
+	WIDTH_OFFSET = (WINDOW_WIDTH - WIDTH)/2;
+	HEIGHT_OFFSET = (WINDOW_HEIGHT - HEIGHT)/2;
 
 	for(int i=0;i<SDL_GetNumRenderDrivers();i++) {
 		SDL_RendererInfo info;
@@ -169,7 +178,7 @@ int initWindow(SDL_Window **window, SDL_Renderer **renderer, int argc, char *arg
 		printf("\n");*/
 	}
 	
-	*window = SDL_CreateWindow("Terracer", SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, 0); // SDL_WINDOW_BORDERLESS
+	*window = SDL_CreateWindow("Terracer", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, (useFullscreen ? SDL_WINDOW_BORDERLESS : 0));
 											//  -1 for first rendering driver that fits the flags
 	if(useSoftwareAccel || (*renderer = SDL_CreateRenderer(*window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC)) == NULL) {
 		fprintf(stderr, "Loading hardware acceleration failed. Using software fallback...\n");
@@ -178,5 +187,8 @@ int initWindow(SDL_Window **window, SDL_Renderer **renderer, int argc, char *arg
 			return 1;
 		}
 	}
+
+	SDL_RenderSetLogicalSize(*renderer,800,600);
+	
 	return 0;
 }

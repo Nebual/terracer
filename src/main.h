@@ -9,8 +9,7 @@ extern int entsC;
 extern int quit;
 extern Entity *ply;
 
-extern int WIDTH;
-extern int HEIGHT;
+extern int WIDTH, HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, WIDTH_OFFSET, HEIGHT_OFFSET;
 
 
 int initWindow(SDL_Window **window,SDL_Renderer **renderer, int argc, char *argv[]);
