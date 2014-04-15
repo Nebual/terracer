@@ -15,8 +15,8 @@ warn: EXTRACFLAGS += -Wall
 # Targetting Windows x64
 win32: CC:=x86_64-w64-mingw32-$(CC)
 win32: EXECUTABLE:=$(EXECUTABLE).exe
-win32: CFLAGS=-I$(WINFOLDER)include/SDL2 -Dmain=SDL_main
-win32: LIBS=-L$(WINFOLDER)lib -lmingw32 -lSDL2main -lSDL2 $(EXTRALIBS)
+win32: CFLAGS+=-I$(WINFOLDER)include/SDL2 -Dmain=SDL_main
+win32: LIBS+=-L$(WINFOLDER)lib -lmingw32 -lSDL2main -lSDL2 $(EXTRALIBS)
 
 
 ifeq ($(OS),Windows_NT)

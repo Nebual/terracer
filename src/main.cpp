@@ -188,7 +188,7 @@ int initWindow(SDL_Window **window, SDL_Renderer **renderer, int argc, char *arg
 		}
 	}
 
-	SDL_RenderSetLogicalSize(*renderer,800,600);
+	SDL_RenderSetLogicalSize(*renderer, WIDTH, HEIGHT);
 	
 	return 0;
 }
