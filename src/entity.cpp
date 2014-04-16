@@ -20,15 +20,15 @@ const int MAX_COLLISION_ITERATIONS = 3;
 const int INTERACT_DIST = 50;
 
 TextureData ballTD;
-TextureData blockTDs[127];
+std::map <std::string, TextureData> blockTDs;
 TextureData explosionTD;
 static Mix_Chunk *bounceSound;
 static Mix_Chunk *hitSounds[3];
 static Mix_Chunk *failSound;
 void initTextures() {
 	ballTD = TextureDataCreate("res/ball.png");
-	blockTDs[BLOCK_NORMAL] = TextureDataCreate("res/block.png");
-	blockTDs[BLOCK_TOUGH] = TextureDataCreate("res/block_tough.png");
+	blockTDs[BLOCK_DIRT] = TextureDataCreate("res/block.png");
+	blockTDs[BLOCK_STONE] = TextureDataCreate("res/block_tough.png");
 
 	explosionTD.texture = IMG_LoadTexture(renderer, "res/explosion_50.png");
 	explosionTD.animMaxFrames = 36;
@@ -59,7 +59,6 @@ Entity::Entity(TextureData texdata, Type type, int x, int y) {
 	this->pos = (Vector) {(double) x,(double) y};
 	this->vel = (Vector) {0,0};
 	this->type = type;
-	this->blockType = BLOCK_NONE;
 	this->collision = 0;
 	this->collisionSize = (this->rect.w + this->rect.h) / 4; // Average of widthheight / 2
 	this->damage = 0;

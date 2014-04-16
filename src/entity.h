@@ -1,6 +1,9 @@
 #ifndef __ENTITY_H
 #define __ENTITY_H
 
+#include <map>
+#include <string>
+
 typedef struct {
 	double x, y;
 } Vector;
@@ -14,11 +17,8 @@ typedef enum {
 	TYPE_MAX
 } Type;
 
-typedef enum {
-	BLOCK_NONE = ' ',
-	BLOCK_NORMAL = '=',
-	BLOCK_TOUGH = '#'
-} BlockType;
+static std::string BLOCK_DIRT = "dirt";
+static std::string BLOCK_STONE = "stone";
 
 typedef struct {
 	SDL_Texture *texture;
@@ -62,7 +62,6 @@ struct Entity {
 	short int health;			// Ships
 
 	Type type;
-	BlockType blockType;
 	
 	Action action;
 	
@@ -83,7 +82,7 @@ struct Entity {
 	void interact();
 };
 
-extern TextureData blockTDs[127];
+extern std::map <std::string, TextureData> blockTDs;
 
 void initTextures();
 

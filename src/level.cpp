@@ -2,6 +2,7 @@
 #include <sys/time.h>
 #include <math.h>
 #include <getopt.h>
+#include <fstream>
 
 #include <SDL.h>
 #include <SDL2/SDL_image.h>
@@ -34,7 +35,12 @@ void generateLevel(int level) {
 	}
 	Entity::GC();
 
-	loadJSONLevel(level);
+	Json::Value root;   // will contains the root value after parsing.
+	if(!loadJSONLevel(level, root)) {
+		printf("Error parsing JSON file for level %d!\n", level);
+		return; // TODO: Load from a default?
+	}
+	Json::Value tileset = root["tileset"];
 	
 	curLevel = level;
 	char filename[14] = "";
@@ -49,30 +55,35 @@ void generateLevel(int level) {
 		return;
 	}
 	
+	char blockC[] = "-";
 	for(int y=0; fgets(line, sizeof(line), fp); y++) {
 		if(DEBUG) printf("Read line: %s", line);
 		for(int x=0; x<16; x++) {
-			if(blockTDs[line[x]].texture != NULL) {
+			if(line[x] <= 32) continue;
+			blockC[0] = line[x];
+			if(!!tileset[blockC]) {
 				if(DEBUG) printf("Spawning block(%d,%c)\n", line[x], line[x]);
-				Entity *ent = new Entity(blockTDs[line[x]], TYPE_BLOCK, x*50, y*25);
-				ent->blockType = (BlockType) line[x];
-				switch(ent->blockType){
-					case BLOCK_TOUGH:
-						ent->health *= 2;
-						break;
-				}
+				Entity *ent = new Entity(blockTDs[tileset[blockC]["texture"].asString()], TYPE_BLOCK, x*50, y*25);
+			} else {
+				printf("Unknown Block: '%c' (%d)\n", line[x], line[x]);
 			}
 		}
 		memset(line, '\0', sizeof(line));
 	}
-	Entity *testInteract = new Entity(blockTDs[BLOCK_TOUGH], TYPE_BLOCK, 400, 200);
+	Entity *testInteract = new Entity(blockTDs[BLOCK_STONE], TYPE_BLOCK, 400, 200);
 	testInteract->action = PLY_HEALTH_UP;
 }
 
-void loadJSONLevel(int level) {
-	Json::Value root;   // will contains the root value after parsing.
+bool loadJSONLevel(int level, Json::Value &root) {
+	char filename[15] = "";
+	sprintf(filename, "levels/%d.json", level);
+	if(DEBUG) printf("Reading JSON file %s\n", filename);
+	
+	std::ifstream in(filename);
 	Json::Reader reader;
-	bool parsingSuccessful = reader.parse( "{\"hi\": 5}", root );
+	bool parsingSuccessful = reader.parse( in, root );
+	if(!parsingSuccessful) {printf("JSON Parsing Error: %s\n", reader.getFormattedErrorMessages().c_str());}
+	return parsingSuccessful;
 }
 
 void drawBackground(SDL_Renderer *renderer, double dt) {
