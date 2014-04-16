@@ -19,6 +19,9 @@ SDL_Renderer *renderer;
 Entity *ents[512];
 int entsC = 0;
 
+Entity *renderLayers[RL_MAX][512];
+int renderLayersC[RL_MAX];
+
 int WIDTH, HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, WIDTH_OFFSET, HEIGHT_OFFSET;
 int FIRSTLEVEL = 1;
 Entity *ply;
@@ -69,9 +72,11 @@ int main(int argc, char *argv[]) {
 		// ====================
 		// Drawing
 		drawBackground(renderer, dt);
-		for(int enti=0; enti<entsC; enti++) {
-			if(ents[enti] == NULL) continue;
-			ents[enti]->Draw(dt);
+		for(int rli=0; rli<RL_MAX; rli++){
+			for(int enti=0; enti<renderLayersC[rli]; enti++) {
+				if(renderLayers[rli][enti] == NULL) continue;
+				renderLayers[rli][enti]->Draw(dt);
+			}
 		}
 		drawHud(dt);
 

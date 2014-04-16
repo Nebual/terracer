@@ -74,14 +74,17 @@ Entity::Entity(TextureData texdata, Type type, int x, int y) : Drawable(texdata,
 	switch(type) {
 		case TYPE_PLAYER:
 			this->collision = 1;
+			this->renderLayer = RL_FOREGROUND;
 			break;
 		case TYPE_BLOCK:
 			this->collision = 1;
 			this->health = 100;
+			this->renderLayer = RL_BACKGROUND;
 			break;
 	}
 	
-	ents[entsC] = this; entsC++;
+	ents[entsC++] = this;
+	renderLayers[this->renderLayer][renderLayersC[this->renderLayer]++] = this;
 }
 Entity::~Entity() {
 	// TODO: These should probably utilize an internal entID and rlID, but then GC would be harder
@@ -102,7 +105,21 @@ void Entity::GC() {
 			newC++;
 		}
 	}
+	
 	entsC = newC;
+	
+	for(int rl = 0; rl < RL_MAX; rl++){
+		newC = 0;
+		for(int i = 0; i < renderLayersC[rl]; i++){
+			if(renderLayers[rl][i] != NULL){
+				renderLayers[rl][newC] = renderLayers[rl][i];
+				if(i != newC) { renderLayers[rl][i] = NULL;}
+				newC++;
+			}
+		}
+		renderLayersC[rl] = newC;
+	}
+	
 }
 void Entity::Draw(double dt) {
 	this->rect.x = this->pos.x;
@@ -355,10 +372,13 @@ Drawable::Drawable(TextureData texdata, int x, int y) {
 	this->animTime = 0;
 	this->animDuration = 0;
 	this->animMaxFrames = 0;
+	this->renderLayer = RL_BACKGROUND;
 }
 
 Drawable::~Drawable() {
-
+	for(int i=0; i<renderLayersC[this->renderLayer]; i++) {
+		if(renderLayers[this->renderLayer][i] == this) {renderLayers[this->renderLayer][i] = NULL; break;}
+	}
 }
 
 SDL_Rect* Drawable::GetFrame(double dt) {

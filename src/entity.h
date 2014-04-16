@@ -43,6 +43,13 @@ enum Action {
 	PLY_LIVES_UP
 };
 
+enum RenderLayer{
+	RL_BACKGROUND,
+	RL_FOREGROUND,
+	RL_HUD,
+	RL_MAX
+};
+
 Direction operator|(Direction a, Direction b);
 
 struct Drawable {
@@ -52,6 +59,7 @@ struct Drawable {
 	double animTime;
 	double animDuration;
 	short int animMaxFrames;
+	RenderLayer renderLayer;
 
 	Drawable(TextureData texdata, int x, int y);
 	~Drawable();
