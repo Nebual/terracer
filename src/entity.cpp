@@ -22,6 +22,7 @@ const int INTERACT_DIST = 50;
 TextureData ballTD;
 std::map <std::string, TextureData> blockTDs;
 TextureData explosionTD;
+TextureData playerTDs[9];
 static Mix_Chunk *bounceSound;
 static Mix_Chunk *hitSounds[3];
 static Mix_Chunk *failSound;
@@ -35,6 +36,11 @@ void initTextures() {
 	explosionTD.w = 50; explosionTD.h = 50;
 	explosionTD.animWidth = 8;
 	explosionTD.animDuration = 2;
+	
+	playerTDs[LEFT] = TextureDataCreate("res/player_left.png");
+	playerTDs[RIGHT] = TextureDataCreate("res/player_right.png");
+	//playerTDs[UP] = TextureDataCreate("res/player_up.png");
+	//playerTDs[DOWN] = TextureDataCreate("res/player_down.png");
 
 	bounceSound = Mix_LoadWAV("res/sounds/bounce.ogg");
 	hitSounds[0] = Mix_LoadWAV("res/sounds/hit1.wav");
@@ -68,6 +74,7 @@ Entity::Entity(TextureData texdata, Type type, int x, int y) {
 	this->animDuration = 0;
 	this->animMaxFrames = 0;
 	this->action = NO_ACTION;
+	this->facing = RIGHT;
 	switch(type) {
 		case TYPE_PLAYER:
 			this->collision = 1;
@@ -325,6 +332,28 @@ void Entity::interact() {
 	if(closest == NULL) {return;}
 	if(closest->action == NO_ACTION) {return;}
 	closest->use();
+}
+
+void Entity::face(Direction newDirection) {
+	if(facing == newDirection) {
+		return;
+	}
+	facing = newDirection;
+	
+	switch(newDirection) {
+		case LEFT:
+			this->texture = playerTDs[LEFT].texture;
+			break;
+		case RIGHT:
+			this->texture = playerTDs[RIGHT].texture;
+			break;
+		/*case UP:
+			this->texture = playerTDs[UP].texture;
+			break;
+		case DOWN:
+			this->texture = playerTDs[DOWN].texture;
+			break;*/
+	}
 }
 
 inline Direction operator|(Direction a, Direction b) {return static_cast<Direction>(static_cast<int>(a) | static_cast<int>(b));}

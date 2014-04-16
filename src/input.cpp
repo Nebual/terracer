@@ -77,9 +77,11 @@ void handleKeyboard(double dt, Entity *ply) {
 	if(playerOnGround) {
 		if(keysPressed[SDL_SCANCODE_A] || keysPressed[SDL_SCANCODE_LEFT]) {
 			ply->vel.x = -PLAYER_MAX_SPEED;
+			ply->face(LEFT);
 		}
 		else if(keysPressed[SDL_SCANCODE_D] || keysPressed[SDL_SCANCODE_RIGHT]) {
 			ply->vel.x = PLAYER_MAX_SPEED;
+			ply->face(RIGHT);
 		}
 		else {
 			ply->vel.x = 0;

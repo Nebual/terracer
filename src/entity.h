@@ -64,6 +64,7 @@ struct Entity {
 	Type type;
 	
 	Action action;
+	Direction facing;
 	
 	Entity (TextureData texdata, Type type, int x, int y);
 	~Entity ();
@@ -80,6 +81,7 @@ struct Entity {
 	void use();
 	Entity* closestInteractable(int dist);
 	void interact();
+	void face(Direction newDirection);
 };
 
 extern std::map <std::string, TextureData> blockTDs;
