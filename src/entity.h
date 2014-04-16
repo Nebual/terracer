@@ -45,20 +45,27 @@ enum Action {
 
 Direction operator|(Direction a, Direction b);
 
-struct Entity {
-	Vector vel;
-	Vector pos;
+struct Drawable {
 	SDL_Rect rect;
 	SDL_Texture *texture;
-	Uint32 deathTime;
-	short int collision;
-	short int collisionSize;	// Used by anything involved with collisions. Define size for circle collision check 
-	short int damage;			// Projectiles
 	
 	double animTime;
 	double animDuration;
 	short int animMaxFrames;
 
+	Drawable(TextureData texdata, int x, int y);
+	~Drawable();
+	SDL_Rect* GetFrame(double dt);
+	void Draw(double dt);
+};
+
+struct Entity : Drawable {
+	Vector vel;
+	Vector pos;
+	Uint32 deathTime;
+	short int collision;
+	short int collisionSize;	// Used by anything involved with collisions. Define size for circle collision check 
+	short int damage;			// Projectiles
 	short int health;			// Ships
 
 	Type type;

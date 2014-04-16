@@ -59,9 +59,7 @@ TextureData TextureDataCreate(const char texturePath[]) {
 	return data;
 }
 
-Entity::Entity(TextureData texdata, Type type, int x, int y) {
-	this->texture = texdata.texture;
-	this->rect = (SDL_Rect) {x,y,texdata.w,texdata.h};
+Entity::Entity(TextureData texdata, Type type, int x, int y) : Drawable(texdata, x, y) {
 	this->pos = (Vector) {(double) x,(double) y};
 	this->vel = (Vector) {0,0};
 	this->type = type;
@@ -70,9 +68,6 @@ Entity::Entity(TextureData texdata, Type type, int x, int y) {
 	this->damage = 0;
 	this->health = 0;
 	this->deathTime = 0;
-	this->animTime = 0;
-	this->animDuration = 0;
-	this->animMaxFrames = 0;
 	this->action = NO_ACTION;
 	this->facing = RIGHT;
 	switch(type) {
@@ -108,28 +103,14 @@ void Entity::GC() {
 	}
 	entsC = newC;
 }
-SDL_Rect* EntityGetFrame(Entity *ent, double dt) {
-	if(ent->animDuration != 0) {
-		static SDL_Rect srcRect;
-		static int curFrame;
-		
-		ent->animTime += dt;
-		curFrame = ent->animMaxFrames * (ent->animTime / ent->animDuration);
-		//printf("Test (%.4f, %.4f, %.4f, %d, %d)\n", ent->animTime, ent->animDuration, ent->animTime / ent->animDuration, ent->animMaxFrames, curFrame);
-		srcRect = (SDL_Rect) {ent->rect.w * (curFrame % 8), ent->rect.h * (curFrame / 8), ent->rect.w, ent->rect.h};
-		//if(ent->animFrame > ent->animFrameMax*4) {ent->animFrame = 0;}
-		return &srcRect;
-	}
-	return NULL;
-}
 void Entity::Draw(double dt) {
 	this->rect.x = this->pos.x;
 	this->rect.y = this->pos.y;
 	int ret;
-	//if(ent->type == TYPE_BALL || ent->type == TYPE_PLAYER) { // For some reason, it didn't like switching between the methods on a per-entity basis (using ent->ang != 0)
-	//	ret = SDL_RenderCopyEx(renderer, ent->texture, EntityGetFrame(ent, dt), &ent->rect, ent->ang, NULL, SDL_FLIP_NONE);
+	//if(this->type == TYPE_BALL || this->type == TYPE_PLAYER) { // For some reason, it didn't like switching between the methods on a per-entity basis (using ent->ang != 0)
+	//	ret = SDL_RenderCopyEx(renderer, this->texture, this->GetFrame(dt), &this->rect, this->ang, NULL, SDL_FLIP_NONE);
 	//} else{
-		ret = SDL_RenderCopy(renderer, this->texture, EntityGetFrame(this, dt), &this->rect);
+		ret = SDL_RenderCopy(renderer, this->texture, this->GetFrame(dt), &this->rect);
 	//}
 	if(ret != 0) {printf("Render failed: %s\n", SDL_GetError());}
 }
@@ -357,3 +338,36 @@ void Entity::face(Direction newDirection) {
 }
 
 inline Direction operator|(Direction a, Direction b) {return static_cast<Direction>(static_cast<int>(a) | static_cast<int>(b));}
+
+
+Drawable::Drawable(TextureData texdata, int x, int y) {
+	this->texture = texdata.texture;
+	this->rect = (SDL_Rect) {x,y,texdata.w,texdata.h};
+	this->animTime = 0;
+	this->animDuration = 0;
+	this->animMaxFrames = 0;
+}
+
+Drawable::~Drawable() {
+
+}
+
+SDL_Rect* Drawable::GetFrame(double dt) {
+	if(this->animDuration != 0) {
+		static SDL_Rect srcRect;
+		static int curFrame;
+		
+		this->animTime += dt;
+		curFrame = this->animMaxFrames * (this->animTime / this->animDuration);
+		//printf("Test (%.4f, %.4f, %.4f, %d, %d)\n", ent->animTime, ent->animDuration, ent->animTime / ent->animDuration, ent->animMaxFrames, curFrame);
+		srcRect = (SDL_Rect) {this->rect.w * (curFrame % 8), this->rect.h * (curFrame / 8), this->rect.w, this->rect.h};
+		//if(ent->animFrame > ent->animFrameMax*4) {ent->animFrame = 0;}
+		return &srcRect;
+	}
+	return NULL;
+}
+void Drawable::Draw(double dt) {
+	int ret = SDL_RenderCopy(renderer, this->texture, this->GetFrame(dt), &this->rect);
+	if(ret != 0) {printf("Render failed: %s\n", SDL_GetError());}
+}
+
