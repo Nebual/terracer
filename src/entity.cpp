@@ -17,7 +17,8 @@
 #include "input.h"
 
 const int MAX_COLLISION_ITERATIONS = 3;
-const int INTERACT_DIST = 50;
+const int INTERACT_RANGE = 50;
+const int INTERACT_DISPLACEMENT = 20;
 
 TextureData ballTD;
 std::map <std::string, TextureData> blockTDs;
@@ -309,7 +310,15 @@ Entity* Entity::closestInteractable(int minDist) {
 }
 
 void Entity::interact() {
-	Entity *closest = closestInteractable(INTERACT_DIST);
+	int displacement;
+	
+	if(this->facing == RIGHT){
+		displacement = INTERACT_RANGE + INTERACT_DISPLACEMENT;
+	}else if(this->facing == LEFT){
+		displacement = INTERACT_RANGE - INTERACT_DISPLACEMENT;
+	}
+	
+	Entity *closest = closestInteractable(displacement);
 	if(closest == NULL) {return;}
 	if(closest->action == NO_ACTION) {return;}
 	closest->use();
