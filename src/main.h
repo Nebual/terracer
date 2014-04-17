@@ -6,11 +6,12 @@ extern SDL_Renderer *renderer;
 extern Entity *ents[512];
 extern int entsC;
 
-extern Entity *renderLayers[RL_MAX][512];
+extern Drawable *renderLayers[RL_MAX][512];
 extern int renderLayersC[RL_MAX];
 
 extern int quit;
 extern Entity *ply;
+extern Hud *hud;
 
 extern int WIDTH, HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, WIDTH_OFFSET, HEIGHT_OFFSET;
 

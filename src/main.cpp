@@ -19,13 +19,15 @@ SDL_Renderer *renderer;
 Entity *ents[512];
 int entsC = 0;
 
-Entity *renderLayers[RL_MAX][512];
+Drawable *renderLayers[RL_MAX][512];
 int renderLayersC[RL_MAX];
 
 int WIDTH, HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, WIDTH_OFFSET, HEIGHT_OFFSET;
 int FIRSTLEVEL = 1;
 Entity *ply;
 int quit = 0;
+
+//Hud *hud;
 
 void initVariables(int w, int h) {
 
@@ -43,6 +45,7 @@ int main(int argc, char *argv[]) {
 	generateLevel(FIRSTLEVEL);
 	
 	ply = new Entity(TextureDataCreate("res/player_right.png"), TYPE_PLAYER, WIDTH/2 - 50, 180);
+//	hud = new Hud();
 	
 	int lastFrame = curtime_u() - 1;
 	double dt;
@@ -78,8 +81,9 @@ int main(int argc, char *argv[]) {
 				renderLayers[rli][enti]->Draw(dt);
 			}
 		}
-		drawHud(dt);
-
+		
+		//hud->Draw(dt);
+		
 		// Flip render buffer
 		SDL_RenderPresent(renderer);
 		

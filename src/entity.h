@@ -101,6 +101,9 @@ struct Entity : Drawable {
 
 extern std::map <std::string, TextureData> blockTDs;
 
+extern TextureData heart_fullTD;
+extern TextureData heart_emptyTD;
+
 void initTextures();
 
 TextureData TextureDataCreate(const char texturePath[]);

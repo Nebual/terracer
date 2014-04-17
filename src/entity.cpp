@@ -24,6 +24,9 @@ TextureData ballTD;
 std::map <std::string, TextureData> blockTDs;
 TextureData explosionTD;
 TextureData playerTDs[9];
+TextureData heart_fullTD;
+TextureData heart_emptyTD;
+
 static Mix_Chunk *bounceSound;
 static Mix_Chunk *hitSounds[3];
 static Mix_Chunk *failSound;
@@ -42,6 +45,9 @@ void initTextures() {
 	playerTDs[RIGHT] = TextureDataCreate("res/player_right.png");
 	//playerTDs[UP] = TextureDataCreate("res/player_up.png");
 	//playerTDs[DOWN] = TextureDataCreate("res/player_down.png");
+	
+	heart_fullTD = TextureDataCreate("res/heart_full.png");
+	heart_emptyTD = TextureDataCreate("res/heart_empty.png");
 
 	bounceSound = Mix_LoadWAV("res/sounds/bounce.ogg");
 	hitSounds[0] = Mix_LoadWAV("res/sounds/hit1.wav");
@@ -75,6 +81,7 @@ Entity::Entity(TextureData texdata, Type type, int x, int y) : Drawable(texdata,
 		case TYPE_PLAYER:
 			this->collision = 1;
 			this->renderLayer = RL_FOREGROUND;
+			this->health = 5;
 			break;
 		case TYPE_BLOCK:
 			this->collision = 1;
