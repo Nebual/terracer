@@ -19,6 +19,7 @@
 const int MAX_COLLISION_ITERATIONS = 3;
 const int INTERACT_RANGE = 50;
 const int INTERACT_DISPLACEMENT = 20;
+const int MAX_HP = 5;
 
 TextureData ballTD;
 std::map <std::string, TextureData> blockTDs;
@@ -81,7 +82,7 @@ Entity::Entity(TextureData texdata, Type type, int x, int y) : Drawable(texdata,
 		case TYPE_PLAYER:
 			this->collision = 1;
 			this->renderLayer = RL_FOREGROUND;
-			this->health = 5;
+			this->health = 1;
 			break;
 		case TYPE_BLOCK:
 			this->collision = 1;
@@ -313,7 +314,8 @@ void Entity::use(){
 	if(DEBUG){printf("Action executed: %d\n", action);}	
 	switch(action){
 		case PLY_HEALTH_UP:
-			ply->health += 25;
+			ply->health += 1;
+			hud->fillHearts();
 			break;
 	}
 }
@@ -405,5 +407,46 @@ SDL_Rect* Drawable::GetFrame(double dt) {
 void Drawable::Draw(double dt) {
 	int ret = SDL_RenderCopy(renderer, this->texture, this->GetFrame(dt), &this->rect);
 	if(ret != 0) {printf("Render failed: %s\n", SDL_GetError());}
+}
+
+Hud::Hud() {
+	for(int i = 0; i < MAX_HP; i++){
+		this->hearts[i] = NULL;
+	}
+	
+	fillHearts();
+}
+
+Hud::~Hud(){
+	for(int i = 0; i < MAX_HP; i++){
+		this->hearts[i] = NULL;
+	}
+}
+
+void Hud::fillHearts(){
+	int x = 0;
+	int y = 0;
+	
+	if(ply->health <= 0){return;}
+	double healthPercent = ply->health/((double) MAX_HP);
+	
+	for(int i = 0; i < MAX_HP; i++){
+		double currentPercent = i/((float) MAX_HP);
+		
+		if(currentPercent <= healthPercent){
+			delete hearts[i];
+			hearts[i] = new Drawable(heart_fullTD, x, y);
+		}else{
+			delete hearts[i];
+			hearts[i] = new Drawable(heart_emptyTD, x, y);
+		}
+		x += 50;
+	}	
+}
+
+void Hud::Draw(double dt){
+	for(int i = 0; i < MAX_HP; i++) {
+		this->hearts[i]->Draw(dt);
+	}
 }
 

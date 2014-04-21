@@ -27,7 +27,7 @@ int FIRSTLEVEL = 1;
 Entity *ply;
 int quit = 0;
 
-//Hud *hud;
+Hud *hud;
 
 void initVariables(int w, int h) {
 
@@ -45,7 +45,7 @@ int main(int argc, char *argv[]) {
 	generateLevel(FIRSTLEVEL);
 	
 	ply = new Entity(TextureDataCreate("res/player_right.png"), TYPE_PLAYER, WIDTH/2 - 50, 180);
-//	hud = new Hud();
+	hud = new Hud();
 	
 	int lastFrame = curtime_u() - 1;
 	double dt;
@@ -82,7 +82,7 @@ int main(int argc, char *argv[]) {
 			}
 		}
 		
-		//hud->Draw(dt);
+		hud->Draw(dt);
 		
 		// Flip render buffer
 		SDL_RenderPresent(renderer);

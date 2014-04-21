@@ -63,8 +63,8 @@ struct Drawable {
 
 	Drawable(TextureData texdata, int x, int y);
 	~Drawable();
-	SDL_Rect* GetFrame(double dt);
-	void Draw(double dt);
+	virtual SDL_Rect* GetFrame(double dt);
+	virtual void Draw(double dt);
 };
 
 struct Entity : Drawable {
@@ -99,10 +99,17 @@ struct Entity : Drawable {
 	void face(Direction newDirection);
 };
 
-extern std::map <std::string, TextureData> blockTDs;
 
-extern TextureData heart_fullTD;
-extern TextureData heart_emptyTD;
+struct Hud{
+	Drawable *hearts[5];
+	
+	Hud();
+	~Hud();
+	void Draw(double dt);
+	void fillHearts();
+};
+
+extern std::map <std::string, TextureData> blockTDs;
 
 void initTextures();
 

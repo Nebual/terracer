@@ -20,8 +20,6 @@ int displayWinText;
 int displayLevelText;
 char menuMode[50];
 
-const int MAX_HP = 5;
-
 void checkWinLoss(){
 	if(menuMode[0] != '\0'){return;}
 }
@@ -95,47 +93,6 @@ void drawBackground(SDL_Renderer *renderer, double dt) {
 	SDL_RenderFillRect(renderer, &rect);
 }
 
-Hud::Hud() {
-	
-	fillHearts();
-}
 
-void Hud::fillHearts(){
-	int x = 0;
-	int y = 0;
-	
-	if(ply->health <= 0){return;}
-	double healthPercent = ply->health/((double) MAX_HP);
-	
-	for(int i = 0; i < sizeof(this->hearts); i++){
-		double currentPercent = i/((float) sizeof(this->hearts));
-		
-		if(currentPercent <= healthPercent){
-			hearts[i] = new Drawable(heart_fullTD, x, y);
-		}else{
-			hearts[i] = new Drawable(heart_emptyTD, x, y);
-		}
-		x += 50;
-	}	
-}
-
-void Hud::Draw(double dt){
-	for(int i = 0; i < sizeof(this->hearts); i++) {
-		this->hearts[i]->Draw(dt);
-	}
-}
-
-void drawHud(double dt){
-	if(menuMode[0] != '\0'){
-		displayTextCentered(400, 200, menuMode);
-	}
-	drawHealth();
-}
-
-void drawHealth(){
-	Drawable *heart = new Drawable(heart_fullTD, 0, 0);
-	heart->renderLayer = RL_FOREGROUND;
-	renderLayers[heart->renderLayer][renderLayersC[heart->renderLayer]++] = heart;
-}
 
 

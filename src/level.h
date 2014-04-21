@@ -6,16 +6,6 @@
 extern int curLevel;
 extern char menuMode[];
 
-
-struct Hud{
-	Drawable *hearts[];
-	
-	Hud();
-	~Hud();
-	void Draw(double dt);
-	void fillHearts();
-};
-
 void checkWinLoss();
 void generateLevel(int level);
 bool loadJSONLevel(int level, Json::Value &root);
