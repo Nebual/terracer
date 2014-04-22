@@ -7,7 +7,7 @@ EXTERNALSOURCES=jsoncpp.cpp
 
 CC=g++
 C99MODE=-std=c++0x
-EXTRACFLAGS=-g $(C99MODE)
+EXTRACFLAGS=-g $(C99MODE) -Wuninitialized -Wmissing-field-initializers
 
 debug: EXTRACFLAGS +=-DDEBUG -g
 warn: EXTRACFLAGS += -Wall -Wextra

@@ -17,7 +17,7 @@ SDL_Color WHITE;
 void initFonts(){
 	prototype = TTF_OpenFont("res/fonts/Prototype.ttf", 24);
 	
-	WHITE = {255,255,255};
+	WHITE = {255,255,255,255};
 }
 
 void fpsCounter() {	

@@ -74,7 +74,7 @@ void generateLevel(int level) {
 	}
 	
 	char blockC[] = "-";
-	int x, y, biggestX, biggestY;
+	int x=0, y=0, biggestX=0, biggestY=0;
 	Entity *ent;
 	for(y=0; fgets(line, sizeof(line), fp); y++) {
 		if(DEBUG) printf("Read line: %s", line);
