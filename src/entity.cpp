@@ -427,9 +427,9 @@ void Hud::fillHearts(){
 	double healthPercent = ply->health/((double) MAX_HP);
 	
 	for(int i = 0; i < MAX_HP; i++){
-		double currentPercent = i/((float) MAX_HP);
+		double currentPercent = i/((double) MAX_HP);
 		
-		if(currentPercent <= healthPercent){
+		if(currentPercent < healthPercent){
 			hearts[i]->texture = heart_fullTD.texture;
 		}else{
 			hearts[i]->texture = heart_emptyTD.texture;
