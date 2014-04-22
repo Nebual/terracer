@@ -3,6 +3,7 @@
 #include <math.h>
 #include <getopt.h>
 #include <fstream>
+#include <algorithm>    // std::find
 
 #include <SDL.h>
 #include <SDL2/SDL_image.h>
@@ -20,8 +21,18 @@ int displayWinText;
 int displayLevelText;
 char menuMode[50];
 
+Entity* posLookup[100][100];
+
 void checkWinLoss(){
 	if(menuMode[0] != '\0'){return;}
+}
+
+void setEntityProperties(Entity* ent, Json::Value info) {
+	if(!!info["collision"]) {ent->collision = info["collision"].asBool();}
+	if(!!info["action"]) {
+		ent->action = (Action) (std::find(actionLookup, actionLookup + MAX_ACTIONS, info["action"].asString()) - actionLookup);
+		if(ent->action == MAX_ACTIONS) {ent->action = NO_ACTION; printf("Ent properties error: no such action '%s'!\n", info["action"].asCString());}
+	}
 }
 
 void generateLevel(int level) {
@@ -56,22 +67,38 @@ void generateLevel(int level) {
 	}
 	
 	char blockC[] = "-";
-	for(int y=0; fgets(line, sizeof(line), fp); y++) {
+	int x, y;
+	Entity *ent;
+	for(y=0; fgets(line, sizeof(line), fp); y++) {
 		if(DEBUG) printf("Read line: %s", line);
-		for(int x=0; x<16; x++) {
+		for(x=0; x<16; x++) {
 			if(line[x] <= 32) continue;
 			blockC[0] = line[x];
 			if(!!tileset[blockC]) {
-				if(DEBUG) printf("Spawning block(%d,%c)\n", line[x], line[x]);
-				Entity *ent = new Entity(blockTDs[tileset[blockC]["texture"].asString()], TYPE_BLOCK, x*50, y*25);
+				if(DEBUG) printf("Spawning block(%d,%d) type(%d,%c)\n", x, y, line[x], line[x]);
+				ent = new Entity(blockTDs[tileset[blockC]["texture"].asString()], TYPE_BLOCK, x*50, y*25);
+				posLookup[x][y] = ent; // TODO: Remove from list, ensure consistency across block movements
+				setEntityProperties(ent, tileset[blockC]);
 			} else {
 				printf("Unknown Block: '%c' (%d)\n", line[x], line[x]);
 			}
 		}
 		memset(line, '\0', sizeof(line));
 	}
-	Entity *testInteract = new Entity(blockTDs[BLOCK_STONE], TYPE_BLOCK, 400, 200);
-	testInteract->action = PLY_HEALTH_UP;
+	
+	Json::Value customEntities = root["entities"];
+	char sPos[20];
+	for(Json::ValueIterator iter = customEntities.begin(); iter != customEntities.end(); iter++ ) {
+		strncpy(sPos, iter.memberName(), sizeof(sPos)-1);
+		x = atoi(strtok(sPos+1, ","));
+		y = atoi(strtok(NULL, ")"));
+		if((ent = posLookup[x][y]) == NULL) {
+			printf("Level setup error: Entity(%d,%d) not found!\n", x, y);
+			continue;
+		}
+		if(DEBUG) printf("Applying Entity(%d,%d) specifics...\n", x, y);
+		setEntityProperties(ent, *iter);
+	}
 }
 
 bool loadJSONLevel(int level, Json::Value &root) {

@@ -311,8 +311,8 @@ double Entity::Distance(Entity *ent2) {
 }
 
 void Entity::use(){
-	if(DEBUG){printf("Action executed: %d\n", action);}	
-	switch(action){
+	if(DEBUG){printf("Action executed: %d\n", this->action);}	
+	switch(this->action){
 		case PLY_HEALTH_UP:
 			ply->health += 1;
 			hud->fillHearts();
@@ -346,7 +346,6 @@ void Entity::interact() {
 	
 	Entity *closest = closestInteractable(displacement);
 	if(closest == NULL) {return;}
-	if(closest->action == NO_ACTION) {return;}
 	closest->use();
 }
 

@@ -4,13 +4,14 @@
       "texture": "dirt"
     },
     "#": {
-	  "texture": "stone"
+      "texture": "stone",
+      "collision": false
 	}
   },
   "entities": {
-    "(5,6)": {
+    "(8,9)": {
       "action": "PLY_HEALTH_UP",
-      "value": 25
+      "collision": false
     }
   }
 }
