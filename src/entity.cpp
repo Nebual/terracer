@@ -411,7 +411,7 @@ void Drawable::Draw(double dt) {
 
 Hud::Hud() {
 	for(int i = 0; i < MAX_HP; i++){
-		this->hearts[i] = NULL;
+		hearts[i] = new Drawable(heart_emptyTD, i*50, 0);
 	}
 	
 	fillHearts();
@@ -419,14 +419,11 @@ Hud::Hud() {
 
 Hud::~Hud(){
 	for(int i = 0; i < MAX_HP; i++){
-		this->hearts[i] = NULL;
+		delete this->hearts[i];
 	}
 }
 
 void Hud::fillHearts(){
-	int x = 0;
-	int y = 0;
-	
 	if(ply->health <= 0){return;}
 	double healthPercent = ply->health/((double) MAX_HP);
 	
@@ -434,13 +431,10 @@ void Hud::fillHearts(){
 		double currentPercent = i/((float) MAX_HP);
 		
 		if(currentPercent <= healthPercent){
-			delete hearts[i];
-			hearts[i] = new Drawable(heart_fullTD, x, y);
+			hearts[i]->texture = heart_fullTD.texture;
 		}else{
-			delete hearts[i];
-			hearts[i] = new Drawable(heart_emptyTD, x, y);
+			hearts[i]->texture = heart_emptyTD.texture;
 		}
-		x += 50;
 	}	
 }
 
@@ -449,4 +443,3 @@ void Hud::Draw(double dt){
 		this->hearts[i]->Draw(dt);
 	}
 }
-
