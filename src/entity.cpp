@@ -64,7 +64,6 @@ TextureData TextureDataCreate(const char texturePath[]) {
 
 Entity::Entity(TextureData texdata, int x, int y) : Drawable(texdata, x, y) {
 	this->pos = (Vector) {(double) x,(double) y};
-	this->vel = (Vector) {0,0};
 	this->collision = 0;
 	this->collisionSize = (this->rect.w + this->rect.h) / 4; // Average of widthheight / 2
 	this->damage = 0;
@@ -136,10 +135,7 @@ void Entity::Update(double dt) {
 		return;
 	}
 }
-void Entity::Movement(double dt) {
-	this->pos.x += this->vel.x * dt;
-	this->pos.y += this->vel.y * dt;
-}
+
 Entity* Entity::TestCollision() {
 	for(int i=0; i<entsC; i++) {
 		if(ents[i] == NULL || ents[i]->collision == 0 || this == ents[i]) continue;
@@ -164,7 +160,18 @@ int Entity::ContainsPoint(double x, double y) {
 		y > this->pos.y);
 }
 
-Entity* Entity::CollisionMovement(Direction &collideDir, double dt) {
+PhysicsEntity::PhysicsEntity(TextureData texdata, int x, int y) : Entity(texdata, x, y) {
+	this->vel = (Vector) {0,0};
+	this->onGround = 0;
+	this->jumpTime = 0;
+}
+
+void PhysicsEntity::Movement(double dt) {
+	this->pos.x += this->vel.x * dt;
+	this->pos.y += this->vel.y * dt;
+}
+
+Entity* PhysicsEntity::CollisionMovement(Direction &collideDir, double dt) {
 	static Vector points[9] = {
 		{(double) this->rect.w/2, 0}, // Top (1 point)
 		{(double) this->rect.w/4, (double) this->rect.h}, {(double) this->rect.w * (3.0d/4), (double) this->rect.h}, // Bottom (2 points)
@@ -250,6 +257,33 @@ Entity* Entity::CollisionMovement(Direction &collideDir, double dt) {
 	}
 	
 	return hit;
+}
+
+void PhysicsEntity::Update(double dt) {
+	if(abs(this->vel.y) > JUMP_THRESHOLD) {this->onGround = 0;}
+			
+	Direction collideDir;
+	for (int i=0; i < MAX_COLLISION_ITERATIONS; i++) {
+		collideDir = (Direction) 0;
+		Entity *hit = this->CollisionMovement(collideDir, dt);
+		if(hit == NULL) { break; }
+		this->HandleCollision(collideDir, dt);
+	}
+	this->Movement(dt);
+	
+	// Clamp movement to sides of level
+	if((this->pos.x + this->rect.w) > curLevel->w) {
+		this->pos.x = curLevel->w - this->rect.w;
+	}
+	else if(this->pos.x < 0) {
+		this->pos.x = 0;
+	}
+	
+	Entity::Update(dt);
+}
+
+void PhysicsEntity::HandleCollision(Direction collideDir, double dt) {
+
 }
 
 void Entity::Damage(int damage) {

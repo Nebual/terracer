@@ -2,7 +2,7 @@
 #define __INPUT_H
 
 // Forward declarations
-class Entity;
+class PhysicsEntity;
 
 const int PLAYER_AIR_ACCEL = 900;
 const int PLAYER_MAX_SPEED = 300;
@@ -12,14 +12,12 @@ const int JUMP_THRESHOLD = 150;
 const int CAM_DEADZONE = 50;
 const int CAM_SPEED = 3;
 
-struct Player : Entity {
-	int onGround;
-	double jumpTime;
-	
+struct Player : PhysicsEntity {
 	Player (TextureData texdata, int x, int y);
 	void SetupRenderLayer();
 	void Update(double dt);
 	void HandleKeyboard(double dt);
+	void HandleCollision(Direction collideDir, double dt);
 };
 
 #endif

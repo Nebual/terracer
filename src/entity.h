@@ -71,7 +71,6 @@ struct Drawable {
 };
 
 struct Entity : Drawable {
-	Vector vel;
 	Vector pos;
 	Uint32 deathTime;
 	short int collision;
@@ -87,11 +86,9 @@ struct Entity : Drawable {
 	virtual void SetupRenderLayer();
 	void Draw(double dt);
 	virtual void Update(double dt);
-	void Movement(double dt);
 	static void GC();
 	int ContainsPoint(double x, double y);
 	Entity* TestCollision();
-	Entity* CollisionMovement(Direction &dir, double dt);
 	void Damage(int damage);
 	void DeathClock(int delay);
 	double Distance(Entity *ent2);
@@ -99,6 +96,18 @@ struct Entity : Drawable {
 	Entity* closestInteractable(int dist);
 	void interact();
 	void face(Direction newDirection);
+};
+
+struct PhysicsEntity : Entity {
+	Vector vel;
+	int onGround;
+	double jumpTime;
+	
+	PhysicsEntity(TextureData texdata, int x, int y);
+	Entity* CollisionMovement(Direction &dir, double dt);
+	void Movement(double dt);
+	virtual void Update(double dt);
+	virtual void HandleCollision(Direction collideDir, double dt);
 };
 
 struct Hud{

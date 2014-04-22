@@ -14,43 +14,21 @@
 #include "input.h"
 #include "level.h"
 
-Player::Player(TextureData texdata, int x, int y) : Entity(texdata, x, y) {
-	this->onGround = 0;
-	this->jumpTime = 0;
-		
+Player::Player(TextureData texdata, int x, int y) : PhysicsEntity(texdata, x, y) {
 	this->collision = 1;
 	this->health = 1;
 }
 void Player::SetupRenderLayer() {
 	this->renderLayer = RL_FOREGROUND;
-	Entity::SetupRenderLayer();
+	PhysicsEntity::SetupRenderLayer();
+}
+void Player::HandleCollision(Direction collideDir, double dt) {
+	if(collideDir & DOWN) this->onGround = 1;
 }
 void Player::Update(double dt) {
 	this->HandleKeyboard(dt);
 	
-	if(abs(this->vel.y) > JUMP_THRESHOLD) {ply->onGround = 0;}
-			
-	Direction collideDir;
-	for (int i=0; i < MAX_COLLISION_ITERATIONS; i++) {
-		collideDir = (Direction) 0;
-		Entity *hit = this->CollisionMovement(collideDir, dt);
-		if(hit != NULL) {
-			if(collideDir & DOWN) ply->onGround = 1;
-		} else {
-			break;
-		}
-	}
-	this->Movement(dt);
-	
-	// Clamp movement to sides of level
-	if((this->pos.x + this->rect.w) > curLevel->w) {
-		this->pos.x = curLevel->w - this->rect.w;
-	}
-	else if(this->pos.x < 0) {
-		this->pos.x = 0;
-	}
-	
-	Entity::Update(dt);
+	PhysicsEntity::Update(dt);
 }
 
 void Player::HandleKeyboard(double dt) {
