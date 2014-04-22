@@ -10,13 +10,13 @@ C99MODE=-std=c++0x
 EXTRACFLAGS=-g $(C99MODE)
 
 debug: EXTRACFLAGS +=-DDEBUG -g
-warn: EXTRACFLAGS += -Wall
+warn: EXTRACFLAGS += -Wall -Wextra
 
 # Targetting Windows x64
 win32: CC:=x86_64-w64-mingw32-$(CC)
 win32: EXECUTABLE:=$(EXECUTABLE).exe
-win32: CFLAGS+=-I$(WINFOLDER)include/SDL2 -Dmain=SDL_main
-win32: LIBS+=-L$(WINFOLDER)lib -lmingw32 -lSDL2main -lSDL2 $(EXTRALIBS)
+win32: CFLAGS=-I$(WINFOLDER)include/SDL2 -Dmain=SDL_main $(EXTRACFLAGS) -Iexternals/include
+win32: LIBS=-L$(WINFOLDER)lib -lmingw32 -lSDL2main -lSDL2 $(EXTRALIBS)
 
 
 ifeq ($(OS),Windows_NT)
@@ -31,7 +31,7 @@ run: win32
 else
 # Building on Linux
 WINFOLDER:=/usr/x86_64-w64-mingw32/
-CFLAGS=$(shell sdl2-config --cflags)
+CFLAGS=$(shell sdl2-config --cflags) $(EXTRACFLAGS) -Iexternals/include
 LIBS=$(shell sdl2-config --libs) $(EXTRALIBS)
 
 all: compile
@@ -45,7 +45,6 @@ gdb: debug
 	gdb --eval-command=run --args ./$(EXECUTABLE) --software
 endif
 
-CFLAGS+=$(EXTRACFLAGS) -Iexternals/include
 OBJECTS=$(patsubst %.cpp,build/%.o, $(SOURCES))
 EXTERNALOBJECTS=$(patsubst %.cpp,externals/build/%.o, $(EXTERNALSOURCES))
 
@@ -66,6 +65,9 @@ clean:
 	-rm build/*.o
 clean2: #A second one so we can execute clean twice
 	-rm build/*.o
+cleanall:
+	-rm build/*.o
+	-rm externals/build/*.o
 
 compile: $(OBJECTS) $(EXTERNALOBJECTS)
 	@echo
@@ -82,12 +84,12 @@ zipall: all
 	upload $(EXECUTABLE)_all.zip
 
 
-F=main
+F=level
 asm:
-	$(CC) $(CFLAGS) -o $(EXECUTABLE).asm -S src/$(F).c $(LIBS)
+	$(CC) $(CFLAGS) -o $(EXECUTABLE).asm -S src/$(F).cpp $(LIBS)
 	meld $(EXECUTABLE).asm $(EXECUTABLE)_2.asm
 asm2:
-	$(CC) $(CFLAGS) -o $(EXECUTABLE)_2.asm -S src/$(F).c $(LIBS)
+	$(CC) $(CFLAGS) -o $(EXECUTABLE)_2.asm -S src/$(F).cpp $(LIBS)
 asm3:
-	$(CC) $(CFLAGS) -o $(EXECUTABLE)_3.asm -S src/$(F).c $(LIBS)
+	$(CC) $(CFLAGS) -o $(EXECUTABLE)_3.asm -S src/$(F).cpp $(LIBS)
 	meld $(EXECUTABLE).asm $(EXECUTABLE)_2.asm $(EXECTUABLE)_3.asm
