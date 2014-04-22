@@ -47,8 +47,7 @@ void handleKeyboard(double dt, Entity *ply) {
 						break;
 					case SDLK_y:
 						if(menuMode[0] != '\0'){
-							curLevel = 1;
-							generateLevel(curLevel);
+							generateLevel(curLevel->id);
 							return;
 						}
 						break;
@@ -106,4 +105,23 @@ void handleKeyboard(double dt, Entity *ply) {
 		}
 	}
 	ply->vel.y += GRAVITY_ACCEL*dt;
+
+
+	// Camera
+	int plyPosX = ply->pos.x + ply->rect.w - camera.x;
+	int plyPosY = ply->pos.y + ply->rect.h - camera.y;
+	if(plyPosX > (camera.w/2 + CAM_DEADZONE)) {
+		camera.x += (plyPosX - (camera.w/2 + CAM_DEADZONE)) * CAM_SPEED * dt;
+	} else if(plyPosX < (camera.w/2 - CAM_DEADZONE)) {
+		camera.x += (plyPosX - (camera.w/2 - CAM_DEADZONE)) * CAM_SPEED * dt;
+	} if(plyPosY > (camera.h/2 + CAM_DEADZONE)) {
+		camera.y += (plyPosY - (camera.h/2 + CAM_DEADZONE)) * CAM_SPEED * dt;
+	} else if(plyPosY < (camera.h/2 - CAM_DEADZONE)) {
+		camera.y += (plyPosY - (camera.h/2 - CAM_DEADZONE)) * CAM_SPEED * dt;
+	}
+	// Clamp camera to sides of level
+	if(camera.x < 0) camera.x = 0;
+	if(camera.x > (curLevel->w - WIDTH)) camera.x = curLevel->w - WIDTH;
+	if(camera.y < 0) camera.y = 0;
+	if(camera.y > (curLevel->h - HEIGHT)) camera.y = curLevel->h - HEIGHT;
 }

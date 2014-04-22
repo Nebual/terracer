@@ -16,7 +16,6 @@
 #include "level.h"
 #include "util.h"
 
-int curLevel;
 int displayWinText;
 int displayLevelText;
 char menuMode[50];
@@ -35,6 +34,13 @@ void setEntityProperties(Entity* ent, Json::Value info) {
 	}
 }
 
+Level *curLevel;
+Level::Level(int inLevel) {
+	this->w = 0;
+	this->h = 0;
+	this->id = inLevel;
+}
+
 void generateLevel(int level) {
 	strcpy(menuMode, "");
 	
@@ -46,6 +52,8 @@ void generateLevel(int level) {
 	}
 	Entity::GC();
 
+	curLevel = new Level(level);
+
 	Json::Value root;   // will contains the root value after parsing.
 	if(!loadJSONLevel(level, root)) {
 		printf("Error parsing JSON file for level %d!\n", level);
@@ -53,9 +61,8 @@ void generateLevel(int level) {
 	}
 	Json::Value tileset = root["tileset"];
 	
-	curLevel = level;
 	char filename[14] = "";
-	char line[18] = "";
+	char line[101] = "";
 	sprintf(filename, "levels/%d.lvl", level);
 	if(DEBUG) printf("Reading file %s\n", filename);
 	
@@ -67,11 +74,11 @@ void generateLevel(int level) {
 	}
 	
 	char blockC[] = "-";
-	int x, y;
+	int x, y, biggestX, biggestY;
 	Entity *ent;
 	for(y=0; fgets(line, sizeof(line), fp); y++) {
 		if(DEBUG) printf("Read line: %s", line);
-		for(x=0; x<16; x++) {
+		for(x=0; line[x]; x++) {
 			if(line[x] <= 32) continue;
 			blockC[0] = line[x];
 			if(!!tileset[blockC]) {
@@ -79,12 +86,17 @@ void generateLevel(int level) {
 				ent = new Entity(blockTDs[tileset[blockC]["texture"].asString()], TYPE_BLOCK, x*50, y*25);
 				posLookup[x][y] = ent; // TODO: Remove from list, ensure consistency across block movements
 				setEntityProperties(ent, tileset[blockC]);
+
+				if(x > biggestX) biggestX = x;
+				if(y > biggestY) biggestY = y;
 			} else {
 				printf("Unknown Block: '%c' (%d)\n", line[x], line[x]);
 			}
 		}
 		memset(line, '\0', sizeof(line));
 	}
+	curLevel->w = max((biggestX+1)*50, WIDTH);
+	curLevel->h = max((biggestY+1)*25, HEIGHT);
 	
 	Json::Value customEntities = root["entities"];
 	char sPos[20];

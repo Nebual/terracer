@@ -3,7 +3,14 @@
 
 #include "json/json-forwards.h"
 
-extern int curLevel;
+struct Level {
+	int w, h;
+	int id;
+	Level();
+	Level(int inLevel);
+};
+extern Level *curLevel;
+
 extern char menuMode[];
 
 void checkWinLoss();

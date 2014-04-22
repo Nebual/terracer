@@ -25,12 +25,14 @@ int renderLayersC[RL_MAX];
 int WIDTH, HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, WIDTH_OFFSET, HEIGHT_OFFSET;
 int FIRSTLEVEL = 1;
 Entity *ply;
+SDL_Rect camera = {0,0,0,0};
 int quit = 0;
 
 Hud *hud;
 
 void initVariables(int w, int h) {
-
+	camera.w = WIDTH;
+	camera.h = HEIGHT;
 }
 
 int main(int argc, char *argv[]) {

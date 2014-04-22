@@ -130,8 +130,8 @@ void Entity::GC() {
 	
 }
 void Entity::Draw(double dt) {
-	this->rect.x = this->pos.x;
-	this->rect.y = this->pos.y;
+	this->rect.x = this->pos.x - camera.x;
+	this->rect.y = this->pos.y - camera.y;
 	int ret;
 	//if(this->type == TYPE_BALL || this->type == TYPE_PLAYER) { // For some reason, it didn't like switching between the methods on a per-entity basis (using ent->ang != 0)
 	//	ret = SDL_RenderCopyEx(renderer, this->texture, this->GetFrame(dt), &this->rect, this->ang, NULL, SDL_FLIP_NONE);
@@ -161,9 +161,9 @@ void Entity::Update(double dt) {
 			}
 			this->Movement(dt);
 			
-			// Clamp movement to sides of level (for now)
-			if((this->pos.x + this->rect.w) > WIDTH) {
-				this->pos.x = WIDTH - this->rect.w;
+			// Clamp movement to sides of level
+			if((this->pos.x + this->rect.w) > curLevel->w) {
+				this->pos.x = curLevel->w - this->rect.w;
 			}
 			else if(this->pos.x < 0) {
 				this->pos.x = 0;

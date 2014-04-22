@@ -1,6 +1,10 @@
 #ifndef __MAIN_H
 #define __MAIN_H 1
 
+// Forward declarations
+class Entity;
+
+
 extern SDL_Renderer *renderer;
 
 extern Entity *ents[512];
@@ -12,6 +16,7 @@ extern int renderLayersC[RL_MAX];
 extern int quit;
 extern Entity *ply;
 extern Hud *hud;
+extern SDL_Rect camera;
 
 extern int WIDTH, HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, WIDTH_OFFSET, HEIGHT_OFFSET;
 
