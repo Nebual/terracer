@@ -14,10 +14,47 @@
 #include "input.h"
 #include "level.h"
 
-double jumping = 0;
-int playerOnGround = 0;
+Player::Player(TextureData texdata, int x, int y) : Entity(texdata, x, y) {
+	this->onGround = 0;
+	this->jumpTime = 0;
+		
+	this->collision = 1;
+	this->health = 1;
+}
+void Player::SetupRenderLayer() {
+	this->renderLayer = RL_FOREGROUND;
+	Entity::SetupRenderLayer();
+}
+void Player::Update(double dt) {
+	this->HandleKeyboard(dt);
+	
+	if(abs(this->vel.y) > JUMP_THRESHOLD) {ply->onGround = 0;}
+			
+	Direction collideDir;
+	for (int i=0; i < MAX_COLLISION_ITERATIONS; i++) {
+		collideDir = (Direction) 0;
+		Entity *hit = this->CollisionMovement(collideDir, dt);
+		if(hit != NULL) {
+			if(collideDir & DOWN) ply->onGround = 1;
+		} else {
+			break;
+		}
+	}
+	this->Movement(dt);
+	
+	// Clamp movement to sides of level
+	if((this->pos.x + this->rect.w) > curLevel->w) {
+		this->pos.x = curLevel->w - this->rect.w;
+	}
+	else if(this->pos.x < 0) {
+		this->pos.x = 0;
+	}
+	
+	Entity::Update(dt);
+}
 
-void handleKeyboard(double dt, Entity *ply) {
+void Player::HandleKeyboard(double dt) {
+	Player* ply = this;
 	static int keysPressed[255];
 	
 	static SDL_Event keyevent;
@@ -52,8 +89,8 @@ void handleKeyboard(double dt, Entity *ply) {
 						}
 						break;
 					case SDLK_SPACE:
-						if(playerOnGround) {
-							jumping = 0.000000001;
+						if(ply->onGround) {
+							ply->jumpTime = 0.000000001;
 							ply->vel.y = -275;
 						}
 						break;				
@@ -64,7 +101,7 @@ void handleKeyboard(double dt, Entity *ply) {
 				
 				switch(keyevent.key.keysym.sym) {
 					case SDLK_SPACE:
-						jumping = 0;
+						ply->jumpTime = 0;
 						break;
 					case SDLK_e:
 						ply->interact();
@@ -73,7 +110,7 @@ void handleKeyboard(double dt, Entity *ply) {
 		}
 	}
 	
-	if(playerOnGround) {
+	if(ply->onGround) {
 		if(keysPressed[SDL_SCANCODE_A] || keysPressed[SDL_SCANCODE_LEFT]) {
 			ply->vel.x = -PLAYER_MAX_SPEED;
 			ply->face(LEFT);
@@ -97,11 +134,11 @@ void handleKeyboard(double dt, Entity *ply) {
 		}
 	}
 	
-	if(jumping) {
-		jumping += dt;
-		ply->vel.y -= GRAVITY_ACCEL*dt * (PLAYER_JUMP_TIME - jumping/2)/PLAYER_JUMP_TIME;
-		if(jumping > PLAYER_JUMP_TIME) {
-			jumping = 0;
+	if(ply->jumpTime) {
+		ply->jumpTime += dt;
+		ply->vel.y -= GRAVITY_ACCEL*dt * (PLAYER_JUMP_TIME - ply->jumpTime/2)/PLAYER_JUMP_TIME;
+		if(ply->jumpTime > PLAYER_JUMP_TIME) {
+			ply->jumpTime = 0;
 		}
 	}
 	ply->vel.y += GRAVITY_ACCEL*dt;

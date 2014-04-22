@@ -3,7 +3,7 @@
 
 // Forward declarations
 class Entity;
-
+class Player;
 
 extern SDL_Renderer *renderer;
 
@@ -14,7 +14,7 @@ extern Drawable *renderLayers[RL_MAX][512];
 extern int renderLayersC[RL_MAX];
 
 extern int quit;
-extern Entity *ply;
+extern Player *ply;
 extern Hud *hud;
 extern SDL_Rect camera;
 

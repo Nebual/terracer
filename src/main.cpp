@@ -24,7 +24,7 @@ int renderLayersC[RL_MAX];
 
 int WIDTH, HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, WIDTH_OFFSET, HEIGHT_OFFSET;
 int FIRSTLEVEL = 1;
-Entity *ply;
+Player *ply;
 SDL_Rect camera = {0,0,0,0};
 int quit = 0;
 
@@ -46,7 +46,7 @@ int main(int argc, char *argv[]) {
 
 	generateLevel(FIRSTLEVEL);
 	
-	ply = new Entity(TextureDataCreate("res/player_right.png"), TYPE_PLAYER, WIDTH/2 - 50, 180);
+	ply = new Player(TextureDataCreate("res/player_right.png"), WIDTH/2 - 50, 180);
 	hud = new Hud();
 	
 	int lastFrame = curtime_u() - 1;
@@ -64,7 +64,6 @@ int main(int argc, char *argv[]) {
 		// ===================
 		// Update
 		TimerRun();
-		handleKeyboard(dt, ply);
 		for(int enti=0; enti<entsC; enti++) {
 			if(ents[enti] == NULL) continue;
 			ents[enti]->Update(dt);

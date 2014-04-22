@@ -8,14 +8,10 @@ typedef struct {
 	double x, y;
 } Vector;
 
-typedef enum {
-	TYPE_NONE,
-	TYPE_BLOCK,
-	TYPE_PLAYER,
-	TYPE_BALL,
-	TYPE_EXPLOSION,
-	TYPE_MAX
-} Type;
+const int MAX_COLLISION_ITERATIONS = 3;
+const int INTERACT_RANGE = 50;
+const int INTERACT_DISPLACEMENT = 20;
+const int MAX_HP = 5;
 
 static std::string BLOCK_DIRT = "dirt";
 static std::string BLOCK_STONE = "stone";
@@ -82,16 +78,15 @@ struct Entity : Drawable {
 	short int collisionSize;	// Used by anything involved with collisions. Define size for circle collision check 
 	short int damage;			// Projectiles
 	short int health;			// Ships
-
-	Type type;
 	
 	Action action;
 	Direction facing;
 	
-	Entity (TextureData texdata, Type type, int x, int y);
+	Entity (TextureData texdata, int x, int y);
 	~Entity ();
+	virtual void SetupRenderLayer();
 	void Draw(double dt);
-	void Update(double dt);
+	virtual void Update(double dt);
 	void Movement(double dt);
 	static void GC();
 	int ContainsPoint(double x, double y);
@@ -105,7 +100,6 @@ struct Entity : Drawable {
 	void interact();
 	void face(Direction newDirection);
 };
-
 
 struct Hud{
 	Drawable *hearts[5];

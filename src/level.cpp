@@ -13,6 +13,7 @@
 
 #include "entity.h"
 #include "main.h"
+#include "input.h"
 #include "level.h"
 #include "util.h"
 
@@ -46,7 +47,7 @@ void generateLevel(int level) {
 	
 	for(int enti=0; enti<entsC; enti++) {
 		if(ents[enti] == NULL) continue;
-		if(ents[enti]->type == TYPE_BLOCK){
+		if(dynamic_cast<const Player*>(ents[enti]) == 0){ // Delete everything but the player
 			delete ents[enti];
 		}
 	}
@@ -83,7 +84,7 @@ void generateLevel(int level) {
 			blockC[0] = line[x];
 			if(!!tileset[blockC]) {
 				if(DEBUG) printf("Spawning block(%d,%d) type(%d,%c)\n", x, y, line[x], line[x]);
-				ent = new Entity(blockTDs[tileset[blockC]["texture"].asString()], TYPE_BLOCK, x*50, y*25);
+				ent = new Entity(blockTDs[tileset[blockC]["texture"].asString()], x*50, y*25);
 				posLookup[x][y] = ent; // TODO: Remove from list, ensure consistency across block movements
 				setEntityProperties(ent, tileset[blockC]);
 

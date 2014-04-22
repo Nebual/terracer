@@ -16,11 +16,6 @@
 #include "level.h"
 #include "input.h"
 
-const int MAX_COLLISION_ITERATIONS = 3;
-const int INTERACT_RANGE = 50;
-const int INTERACT_DISPLACEMENT = 20;
-const int MAX_HP = 5;
-
 TextureData ballTD;
 std::map <std::string, TextureData> blockTDs;
 TextureData explosionTD;
@@ -67,10 +62,9 @@ TextureData TextureDataCreate(const char texturePath[]) {
 	return data;
 }
 
-Entity::Entity(TextureData texdata, Type type, int x, int y) : Drawable(texdata, x, y) {
+Entity::Entity(TextureData texdata, int x, int y) : Drawable(texdata, x, y) {
 	this->pos = (Vector) {(double) x,(double) y};
 	this->vel = (Vector) {0,0};
-	this->type = type;
 	this->collision = 0;
 	this->collisionSize = (this->rect.w + this->rect.h) / 4; // Average of widthheight / 2
 	this->damage = 0;
@@ -78,22 +72,18 @@ Entity::Entity(TextureData texdata, Type type, int x, int y) : Drawable(texdata,
 	this->deathTime = 0;
 	this->action = NO_ACTION;
 	this->facing = RIGHT;
-	switch(type) {
-		case TYPE_PLAYER:
-			this->collision = 1;
-			this->renderLayer = RL_FOREGROUND;
-			this->health = 1;
-			break;
-		case TYPE_BLOCK:
-			this->collision = 1;
-			this->health = 100;
-			this->renderLayer = RL_BACKGROUND;
-			break;
-	}
+	
+	this->collision = 1;
+	this->health = 100;
+	this->renderLayer = RL_BACKGROUND;
 	
 	ents[entsC++] = this;
+	this->SetupRenderLayer();
+}
+void Entity::SetupRenderLayer() {
 	renderLayers[this->renderLayer][renderLayersC[this->renderLayer]++] = this;
 }
+
 Entity::~Entity() {
 	// TODO: These should probably utilize an internal entID and rlID, but then GC would be harder
 	for(int i=0; i<entsC; i++) {
@@ -144,31 +134,6 @@ void Entity::Update(double dt) {
 	if(this->deathTime != 0 && this->deathTime < SDL_GetTicks()) {
 		delete this;
 		return;
-	}
-	switch(this->type) {
-		case TYPE_PLAYER:
-			if(abs(this->vel.y) > JUMP_THRESHOLD) {playerOnGround = 0;}
-			
-			Direction collideDir;
-			for (int i=0; i < MAX_COLLISION_ITERATIONS; i++) {
-				collideDir = (Direction) 0;
-				Entity *hit = this->CollisionMovement(collideDir, dt);
-				if(hit != NULL) {
-					if(collideDir & DOWN) playerOnGround = 1;
-				} else {
-					break;
-				}
-			}
-			this->Movement(dt);
-			
-			// Clamp movement to sides of level
-			if((this->pos.x + this->rect.w) > curLevel->w) {
-				this->pos.x = curLevel->w - this->rect.w;
-			}
-			else if(this->pos.x < 0) {
-				this->pos.x = 0;
-			}
-			break;
 	}
 }
 void Entity::Movement(double dt) {
@@ -291,7 +256,7 @@ void Entity::Damage(int damage) {
 	if(this->health <= 0) return;
 	this->health -= damage;
 	if(this->health <= 0) {
-		this->type = TYPE_EXPLOSION;
+		//this->type = TYPE_EXPLOSION;
 		this->texture = explosionTD.texture;
 		this->rect.w = explosionTD.w; this->rect.h = explosionTD.h;
 		this->pos.y -= 12;
