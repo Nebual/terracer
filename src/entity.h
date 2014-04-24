@@ -18,6 +18,8 @@ static std::string BLOCK_STONE = "stone";
 
 typedef struct {
 	SDL_Texture *texture;
+	SDL_Texture *left;
+	SDL_Texture *right;
 	short int animMaxFrames;
 	short int animWidth;
 	short int animDuration;
@@ -58,13 +60,14 @@ Direction operator|(Direction a, Direction b);
 struct Drawable {
 	SDL_Rect rect;
 	SDL_Texture *texture;
+	TextureData *texdata;
 	
 	double animTime;
 	double animDuration;
 	short int animMaxFrames;
 	RenderLayer renderLayer;
 
-	Drawable(TextureData texdata, int x, int y);
+	Drawable(TextureData &texdata, int x, int y);
 	~Drawable();
 	virtual SDL_Rect* GetFrame(double dt);
 	virtual void Draw(double dt);
@@ -81,7 +84,7 @@ struct Entity : Drawable {
 	Action action;
 	Direction facing;
 	
-	Entity (TextureData texdata, int x, int y);
+	Entity (TextureData &texdata, int x, int y);
 	~Entity ();
 	virtual void SetupRenderLayer();
 	void Draw(double dt);
@@ -102,10 +105,12 @@ struct PhysicsEntity : Entity {
 	Vector vel;
 	int onGround;
 	double jumpTime;
+	int patrolling;
 	
-	PhysicsEntity(TextureData texdata, int x, int y);
+	PhysicsEntity(TextureData &texdata, int x, int y);
 	Entity* CollisionMovement(Direction &dir, double dt);
 	void Movement(double dt);
+	void moveForward();
 	virtual void Update(double dt);
 	virtual void HandleCollision(Direction collideDir, double dt);
 };
@@ -120,10 +125,12 @@ struct Hud{
 };
 
 extern std::map <std::string, TextureData> blockTDs;
+extern TextureData goombaTD;
+extern TextureData playerTD;
 
 void initTextures();
 
-TextureData TextureDataCreate(const char texturePath[]);
+TextureData TextureDataCreate(const char texturePath[], const char leftPath[] = "", const char rightPath[] = "");
 
 
 #endif

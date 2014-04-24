@@ -14,7 +14,7 @@
 #include "input.h"
 #include "level.h"
 
-Player::Player(TextureData texdata, int x, int y) : PhysicsEntity(texdata, x, y) {
+Player::Player(TextureData &texdata, int x, int y) : PhysicsEntity(texdata, x, y) {
 	this->collision = 1;
 	this->health = 1;
 }
@@ -119,7 +119,6 @@ void Player::HandleKeyboard(double dt) {
 			ply->jumpTime = 0;
 		}
 	}
-	ply->vel.y += GRAVITY_ACCEL*dt;
 
 
 	// Camera

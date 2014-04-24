@@ -19,17 +19,20 @@
 TextureData ballTD;
 std::map <std::string, TextureData> blockTDs;
 TextureData explosionTD;
-TextureData playerTDs[9];
+TextureData playerTD;
 TextureData heart_fullTD;
 TextureData heart_emptyTD;
+TextureData goombaTD;
 
 static Mix_Chunk *bounceSound;
 static Mix_Chunk *hitSounds[3];
 static Mix_Chunk *failSound;
 void initTextures() {
+	
 	ballTD = TextureDataCreate("res/ball.png");
 	blockTDs[BLOCK_DIRT] = TextureDataCreate("res/block.png");
 	blockTDs[BLOCK_STONE] = TextureDataCreate("res/block_tough.png");
+	goombaTD = TextureDataCreate("res/goomba.png");
 
 	explosionTD.texture = IMG_LoadTexture(renderer, "res/explosion_50.png");
 	explosionTD.animMaxFrames = 36;
@@ -37,10 +40,7 @@ void initTextures() {
 	explosionTD.animWidth = 8;
 	explosionTD.animDuration = 2;
 	
-	playerTDs[LEFT] = TextureDataCreate("res/player_left.png");
-	playerTDs[RIGHT] = TextureDataCreate("res/player_right.png");
-	//playerTDs[UP] = TextureDataCreate("res/player_up.png");
-	//playerTDs[DOWN] = TextureDataCreate("res/player_down.png");
+	playerTD = TextureDataCreate("res/player_right.png", "res/player_left.png", "res/player_right.png");
 	
 	heart_fullTD = TextureDataCreate("res/heart_full.png");
 	heart_emptyTD = TextureDataCreate("res/heart_empty.png");
@@ -52,17 +52,24 @@ void initTextures() {
 	failSound = Mix_LoadWAV("res/sounds/fail.ogg");
 }
 
-TextureData TextureDataCreate(const char texturePath[]) {
-	TextureData data = {NULL, 0, 0, 0, 0, 0};
+TextureData TextureDataCreate(const char texturePath[], const char leftPath[], const char rightPath[]) {
+	TextureData data = {NULL, NULL, NULL, 0, 0, 0, 0, 0};
 	data.texture = IMG_LoadTexture(renderer, texturePath);
 	if (!data.texture) {fprintf(stderr, "Couldn't load %s: %s\n", texturePath, SDL_GetError());}
+	data.left = IMG_LoadTexture(renderer, leftPath);
+	if (!data.left) {data.left = data.texture;}
+	data.right = IMG_LoadTexture(renderer, rightPath);
+	if (!data.right) {data.right = data.texture;}
+	
 	SDL_SetTextureBlendMode(data.texture, SDL_BLENDMODE_BLEND);
+	SDL_SetTextureBlendMode(data.left, SDL_BLENDMODE_BLEND);
+	SDL_SetTextureBlendMode(data.left, SDL_BLENDMODE_BLEND);
 	SDL_QueryTexture(data.texture, NULL, NULL, &data.w, &data.h);
 	
 	return data;
 }
 
-Entity::Entity(TextureData texdata, int x, int y) : Drawable(texdata, x, y) {
+Entity::Entity(TextureData &texdata, int x, int y) : Drawable(texdata, x, y) {
 	this->pos = (Vector) {(double) x,(double) y};
 	this->collision = 0;
 	this->collisionSize = (this->rect.w + this->rect.h) / 4; // Average of widthheight / 2
@@ -160,25 +167,30 @@ int Entity::ContainsPoint(double x, double y) {
 		y > this->pos.y);
 }
 
-PhysicsEntity::PhysicsEntity(TextureData texdata, int x, int y) : Entity(texdata, x, y) {
+PhysicsEntity::PhysicsEntity(TextureData &texdata, int x, int y) : Entity(texdata, x, y) {
 	this->vel = (Vector) {0,0};
 	this->onGround = 0;
 	this->jumpTime = 0;
+	this->patrolling = 0;
+	
 }
 
 void PhysicsEntity::Movement(double dt) {
 	this->pos.x += this->vel.x * dt;
 	this->pos.y += this->vel.y * dt;
+	this->vel.y += GRAVITY_ACCEL*dt;
 }
 
 Entity* PhysicsEntity::CollisionMovement(Direction &collideDir, double dt) {
-	static Vector points[9] = {
+	
+	//TODO: Make this a class variable. God help you.
+	Vector points[9] = {
 		{(double) this->rect.w/2, 0}, // Top (1 point)
 		{(double) this->rect.w/4, (double) this->rect.h}, {(double) this->rect.w * (3.0d/4), (double) this->rect.h}, // Bottom (2 points)
 		{0, (double) this->rect.h/4}, {0, (double) this->rect.h/2}, {0, (double) this->rect.h * (3.0d/4)}, // Left (3 points)
 		{(double) this->rect.w, (double) this->rect.h/4}, {(double) this->rect.w, (double) this->rect.h/2}, {(double) this->rect.w, (double) this->rect.h * (3.0d/4)} // Right (3 points)
 	};
-	
+		
 	double originalMoveX, originalMoveY, nextMoveX, nextMoveY;
 	originalMoveX = nextMoveX = this->vel.x * dt;
 	originalMoveY = nextMoveY = this->vel.y * dt;
@@ -270,6 +282,7 @@ void PhysicsEntity::Update(double dt) {
 		this->HandleCollision(collideDir, dt);
 	}
 	this->Movement(dt);
+	if(patrolling){this->moveForward();}
 	
 	// Clamp movement to sides of level
 	if((this->pos.x + this->rect.w) > curLevel->w) {
@@ -282,8 +295,28 @@ void PhysicsEntity::Update(double dt) {
 	Entity::Update(dt);
 }
 
-void PhysicsEntity::HandleCollision(Direction collideDir, double dt) {
+void PhysicsEntity::moveForward(){
+	if(! this->onGround){return;}
+	if(this->facing == LEFT){
+		this->vel.x = -100;
+	}else{
+		this->vel.x = 100;
+	}
+}
 
+void PhysicsEntity::HandleCollision(Direction collideDir, double dt) {
+	if(collideDir & DOWN) this->onGround = 1;	
+	if(this->patrolling){
+		if(! this->onGround || collideDir == LEFT || collideDir == RIGHT){ //we're falling, or we hit a wall
+			
+			//flip direction
+			if(this->facing == RIGHT){
+				this->face(LEFT);
+			}else if(this->facing == LEFT){
+				this->face(RIGHT);
+			}
+		}
+	}
 }
 
 void Entity::Damage(int damage) {
@@ -356,25 +389,20 @@ void Entity::face(Direction newDirection) {
 	
 	switch(newDirection) {
 		case LEFT:
-			this->texture = playerTDs[LEFT].texture;
+			this->texture = this->texdata->left;
 			break;
 		case RIGHT:
-			this->texture = playerTDs[RIGHT].texture;
+			this->texture = this->texdata->right;
 			break;
-		/*case UP:
-			this->texture = playerTDs[UP].texture;
-			break;
-		case DOWN:
-			this->texture = playerTDs[DOWN].texture;
-			break;*/
 	}
 }
 
 inline Direction operator|(Direction a, Direction b) {return static_cast<Direction>(static_cast<int>(a) | static_cast<int>(b));}
 
 
-Drawable::Drawable(TextureData texdata, int x, int y) {
+Drawable::Drawable(TextureData &texdata, int x, int y) {
 	this->texture = texdata.texture;
+	this->texdata = &texdata;
 	this->rect = (SDL_Rect) {x,y,texdata.w,texdata.h};
 	this->animTime = 0;
 	this->animDuration = 0;
