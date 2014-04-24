@@ -66,16 +66,14 @@ TextureData TextureDataCreate(const char texturePath[], const char leftPath[], c
 
 Entity::Entity(TextureData &texdata, int x, int y, RenderLayer rl) : Drawable(texdata, x, y) {
 	this->pos = (Vector) {(double) x,(double) y};
-	this->collision = 0;
+	this->collision = 1;
 	this->collisionSize = (this->rect.w + this->rect.h) / 2; // Average of widthheight / 2
 	this->damage = 0;
-	this->health = 0;
+	this->health = 100;
 	this->deathTime = 0;
 	this->action = NO_ACTION;
 	this->facing = RIGHT;
 	
-	this->collision = 1;
-	this->health = 100;
 	this->renderLayer = rl;
 	
 	ents[entsC++] = this;
@@ -164,7 +162,16 @@ PhysicsEntity::PhysicsEntity(TextureData &texdata, int x, int y, RenderLayer rl)
 	this->onGround = 0;
 	this->jumpTime = 0;
 	this->patrolling = 0;
-	
+	static Vector genericCollisionPoints[9] = {
+					{0.50d, 0}, 			// Top (1 point)
+		{0.25d, 1}, 			{0.75d, 1}, // Bottom (2 points)
+		{0, 0.25d}, {0, 0.50d}, {0, 2/3.0d},// Left (3 points)
+		{1, 0.25d}, {1, 0.50d}, {1, 2/3.0d} // Right (3 points)
+	};
+	for(int i=0; i<9; i++) {
+		this->collisionPoints[i].x = genericCollisionPoints[i].x * this->rect.w;
+		this->collisionPoints[i].y = genericCollisionPoints[i].y * this->rect.h;
+	}
 }
 
 void PhysicsEntity::Movement(double dt) {
@@ -174,20 +181,11 @@ void PhysicsEntity::Movement(double dt) {
 }
 
 Entity* PhysicsEntity::CollisionMovement(Direction &collideDir, double dt) {
-	
-	//TODO: Make this a class variable. God help you.
-	Vector points[9] = {
-		{(double) this->rect.w/2, 0}, // Top (1 point)
-		{(double) this->rect.w/4, (double) this->rect.h}, {(double) this->rect.w * (3.0d/4), (double) this->rect.h}, // Bottom (2 points)
-		{0, (double) this->rect.h/4}, {0, (double) this->rect.h/2}, {0, (double) this->rect.h * (2.0d/3)}, // Left (3 points)
-		{(double) this->rect.w, (double) this->rect.h/4}, {(double) this->rect.w, (double) this->rect.h/2}, {(double) this->rect.w, (double) this->rect.h * (2.0d/3)} // Right (3 points)
-	};
-		
 	double originalMoveX, originalMoveY, nextMoveX, nextMoveY;
 	originalMoveX = nextMoveX = this->vel.x * dt;
 	originalMoveY = nextMoveY = this->vel.y * dt;
 
-	Entity* hit;
+	Entity* hit = NULL;
 	for (int enti = 0; enti < entsC; enti++) {
 		if(ents[enti] == NULL || ents[enti]->collision == 0 || this == ents[enti]) continue;
 		if(ents[enti]->Distance(this) > (ents[enti]->collisionSize + this->collisionSize)) continue;
@@ -205,24 +203,24 @@ Entity* PhysicsEntity::CollisionMovement(Direction &collideDir, double dt) {
 			// as the force of gravity pulls down on the player and causes surface contact,
 			// the correction pushes the player away from the inside of the platform up to the surface.
 			if(dir == 0) {
-				while (ents[enti]->ContainsPoint(points[0].x + this->pos.x, points[0].y + this->pos.y + nextMoveY)) {
+				while (ents[enti]->ContainsPoint(collisionPoints[0].x + this->pos.x, collisionPoints[0].y + this->pos.y + nextMoveY)) {
 					nextMoveY++;
 				}
 			} else if (dir == 1) {
-				while (ents[enti]->ContainsPoint(points[1].x + this->pos.x, points[1].y + this->pos.y + nextMoveY)
-					|| ents[enti]->ContainsPoint(points[2].x + this->pos.x, points[2].y + this->pos.y + nextMoveY)) {
+				while (ents[enti]->ContainsPoint(collisionPoints[1].x + this->pos.x, collisionPoints[1].y + this->pos.y + nextMoveY)
+					|| ents[enti]->ContainsPoint(collisionPoints[2].x + this->pos.x, collisionPoints[2].y + this->pos.y + nextMoveY)) {
 					nextMoveY--;
 				}
 			} else if (dir == 2) {
-				while (ents[enti]->ContainsPoint(points[3].x + this->pos.x + nextMoveX, points[3].y + this->pos.y)
-					|| ents[enti]->ContainsPoint(points[4].x + this->pos.x + nextMoveX, points[4].y + this->pos.y)
-					|| ents[enti]->ContainsPoint(points[5].x + this->pos.x + nextMoveX, points[5].y + this->pos.y)) {
+				while (ents[enti]->ContainsPoint(collisionPoints[3].x + this->pos.x + nextMoveX, collisionPoints[3].y + this->pos.y)
+					|| ents[enti]->ContainsPoint(collisionPoints[4].x + this->pos.x + nextMoveX, collisionPoints[4].y + this->pos.y)
+					|| ents[enti]->ContainsPoint(collisionPoints[5].x + this->pos.x + nextMoveX, collisionPoints[5].y + this->pos.y)) {
 					nextMoveX++;
 				}
 			} else if (dir == 3) {
-				while (ents[enti]->ContainsPoint(points[6].x + this->pos.x + nextMoveX, points[6].y + this->pos.y)
-					|| ents[enti]->ContainsPoint(points[7].x + this->pos.x + nextMoveX, points[7].y + this->pos.y)
-					|| ents[enti]->ContainsPoint(points[8].x + this->pos.x + nextMoveX, points[8].y + this->pos.y)) {
+				while (ents[enti]->ContainsPoint(collisionPoints[6].x + this->pos.x + nextMoveX, collisionPoints[6].y + this->pos.y)
+					|| ents[enti]->ContainsPoint(collisionPoints[7].x + this->pos.x + nextMoveX, collisionPoints[7].y + this->pos.y)
+					|| ents[enti]->ContainsPoint(collisionPoints[8].x + this->pos.x + nextMoveX, collisionPoints[8].y + this->pos.y)) {
 					nextMoveX--;
 				}
 			}
@@ -361,7 +359,7 @@ Entity* Entity::closestInteractable(int minDist) {
 }
 
 void Entity::interact() {
-	int displacement;
+	int displacement = INTERACT_RANGE;
 	
 	if(this->facing == RIGHT){
 		displacement = INTERACT_RANGE + INTERACT_DISPLACEMENT;

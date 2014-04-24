@@ -105,6 +105,7 @@ struct PhysicsEntity : Entity {
 	int onGround;
 	double jumpTime;
 	int patrolling;
+	Vector collisionPoints[9];
 	
 	PhysicsEntity(TextureData &texdata, int x, int y, RenderLayer rl=RL_BACKGROUND);
 	Entity* CollisionMovement(Direction &dir, double dt);
