@@ -330,7 +330,7 @@ void Entity::DeathClock(int delay) {
 }
 
 double Entity::Distance(Entity *ent2) {
-	return pow(pow(this->rect.x - ent2->rect.x, 2) + powf(this->rect.y - ent2->rect.y, 2), 0.5);
+	return pow(pow(this->pos.x - ent2->pos.x, 2) + powf(this->pos.y - ent2->pos.y, 2), 0.5);
 }
 
 void Entity::use(){
@@ -398,7 +398,7 @@ Drawable::Drawable(TextureData &texdata, int x, int y) {
 	this->animTime = 0;
 	this->animDuration = 0;
 	this->animMaxFrames = 0;
-	this->renderLayer = RL_BACKGROUND;
+	this->renderLayer = RL_FOREGROUND;
 }
 
 Drawable::~Drawable() {

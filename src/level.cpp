@@ -22,6 +22,7 @@ int displayLevelText;
 char menuMode[50];
 
 Entity* posLookup[100][100];
+SDL_Texture *backgroundRLTexture;
 
 void checkWinLoss(){
 	if(menuMode[0] != '\0'){return;}
@@ -84,10 +85,11 @@ void generateLevel(int level) {
 			blockC[0] = line[x];
 			if(!!tileset[blockC]) {
 				if(DEBUG) printf("Spawning block(%d,%d) type(%d,%c)\n", x, y, line[x], line[x]);
-				RenderLayer rl = tileset[blockC].get("background", false).asBool() ? RL_BACKGROUND : RL_FOREGROUND;
+				// Note: Anything with RL_BACKGROUND will be compiled into backgroundRLTexture once at startup,
+				// so be sure to set anything that moves to RL_FOREGROUND
+				RenderLayer rl = tileset[blockC].get("static", true).asBool() ? RL_BACKGROUND : RL_FOREGROUND;
 				ent = new Entity(blockTDs[tileset[blockC]["texture"].asString()], x*BLOCK_SIZE, y*BLOCK_SIZE, rl);
 				posLookup[x][y] = ent; // TODO: Remove from list, ensure consistency across block movements
-				if(tileset[blockC].get("background", false).asBool()) {ent->collision = 0;}
 				setEntityProperties(ent, tileset[blockC]);
 
 				if(x > biggestX) biggestX = x;
@@ -100,6 +102,8 @@ void generateLevel(int level) {
 	}
 	curLevel->w = max((biggestX+1)*BLOCK_SIZE, WIDTH);
 	curLevel->h = max((biggestY+1)*BLOCK_SIZE, HEIGHT);
+
+	compileBackground(renderer);
 	
 	Json::Value customEntities = root["entities"];
 	char sPos[20];
@@ -128,10 +132,25 @@ bool loadJSONLevel(int level, Json::Value &root) {
 	return parsingSuccessful;
 }
 
-void drawBackground(SDL_Renderer *renderer, double dt) {
+void compileBackground(SDL_Renderer *renderer) {
+	free(backgroundRLTexture);
+	backgroundRLTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET, curLevel->w, curLevel->h);
+	SDL_SetTextureBlendMode(backgroundRLTexture, SDL_BLENDMODE_NONE);
+	SDL_SetRenderTarget(renderer, backgroundRLTexture);
+	
 	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
 	SDL_SetRenderDrawColor(renderer, 20,20,20, SDL_ALPHA_OPAQUE);
 	SDL_RenderFillRect(renderer, NULL);
+	for(Drawable *ent : renderLayers[RL_BACKGROUND]) {
+		if(ent == NULL) {continue;}
+		ent->Drawable::Draw(0);
+	}
+	
+	SDL_SetRenderTarget(renderer, NULL);
+}
+
+void drawBackground(SDL_Renderer *renderer, double dt) {
+	SDL_RenderCopy(renderer, backgroundRLTexture, &camera, NULL);
 }
 
 

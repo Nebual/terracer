@@ -80,6 +80,9 @@ int main(int argc, char *argv[]) {
 		// Drawing
 		drawBackground(renderer, dt);
 		for(int rli=0; rli<RL_MAX; rli++){
+			if(rli == RL_BACKGROUND) {
+				continue; // Done in drawBackground
+			}
 			Drawable** layer = renderLayers[rli];
 			for(int enti=0; enti<renderLayersC[rli]; enti++) {
 				if(layer[enti] == NULL) continue;

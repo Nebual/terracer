@@ -84,7 +84,7 @@ struct Entity : Drawable {
 	Action action;
 	Direction facing;
 	
-	Entity (TextureData &texdata, int x, int y, RenderLayer rl=RL_BACKGROUND);
+	Entity (TextureData &texdata, int x, int y, RenderLayer rl=RL_FOREGROUND);
 	~Entity ();
 	void Draw(double dt);
 	virtual void Update(double dt);
@@ -107,7 +107,7 @@ struct PhysicsEntity : Entity {
 	int patrolling;
 	Vector collisionPoints[9];
 	
-	PhysicsEntity(TextureData &texdata, int x, int y, RenderLayer rl=RL_BACKGROUND);
+	PhysicsEntity(TextureData &texdata, int x, int y, RenderLayer rl=RL_FOREGROUND);
 	Entity* CollisionMovement(Direction &dir, double dt);
 	void Movement(double dt);
 	void moveForward();

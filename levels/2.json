@@ -5,7 +5,7 @@
     },
     "w": {
 	  "texture": "sandstone_bg",
-	  "background": true
+      "collision": false
 	},
     "S": {
       "texture": "sand"
