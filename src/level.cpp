@@ -1,7 +1,7 @@
 #include <stdio.h>
+#include <string.h>
 #include <sys/time.h>
 #include <math.h>
-#include <getopt.h>
 #include <fstream>
 #include <algorithm>    // std::find
 
@@ -84,8 +84,10 @@ void generateLevel(int level) {
 			blockC[0] = line[x];
 			if(!!tileset[blockC]) {
 				if(DEBUG) printf("Spawning block(%d,%d) type(%d,%c)\n", x, y, line[x], line[x]);
-				ent = new Entity(blockTDs[tileset[blockC]["texture"].asString()], x*50, y*25);
+				RenderLayer rl = tileset[blockC].get("background", false).asBool() ? RL_BACKGROUND : RL_FOREGROUND;
+				ent = new Entity(blockTDs[tileset[blockC]["texture"].asString()], x*BLOCK_SIZE, y*BLOCK_SIZE, rl);
 				posLookup[x][y] = ent; // TODO: Remove from list, ensure consistency across block movements
+				if(tileset[blockC].get("background", false).asBool()) {ent->collision = 0;}
 				setEntityProperties(ent, tileset[blockC]);
 
 				if(x > biggestX) biggestX = x;
@@ -96,8 +98,8 @@ void generateLevel(int level) {
 		}
 		memset(line, '\0', sizeof(line));
 	}
-	curLevel->w = max((biggestX+1)*50, WIDTH);
-	curLevel->h = max((biggestY+1)*25, HEIGHT);
+	curLevel->w = max((biggestX+1)*BLOCK_SIZE, WIDTH);
+	curLevel->h = max((biggestY+1)*BLOCK_SIZE, HEIGHT);
 	
 	Json::Value customEntities = root["entities"];
 	char sPos[20];

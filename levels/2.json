@@ -1,0 +1,17 @@
+{
+  "tileset": {
+    "W": {
+      "texture": "sandstone"
+    },
+    "w": {
+	  "texture": "sandstone_bg",
+	  "background": true
+	},
+    "S": {
+      "texture": "sand"
+	}
+  },
+  "entities": {
+    
+  }
+}

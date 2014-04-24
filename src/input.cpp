@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <sys/time.h>
 #include <math.h>
-#include <getopt.h>
 
 #include <SDL.h>
 #include <SDL2/SDL_image.h>
@@ -14,13 +13,9 @@
 #include "input.h"
 #include "level.h"
 
-Player::Player(TextureData &texdata, int x, int y) : PhysicsEntity(texdata, x, y) {
+Player::Player(TextureData &texdata, int x, int y) : PhysicsEntity(texdata, x, y, RL_FOREGROUND2) {
 	this->collision = 1;
 	this->health = 1;
-}
-void Player::SetupRenderLayer() {
-	this->renderLayer = RL_FOREGROUND;
-	PhysicsEntity::SetupRenderLayer();
 }
 void Player::HandleCollision(Direction collideDir, double dt) {
 	if(collideDir & DOWN) this->onGround = 1;

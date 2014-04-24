@@ -8,7 +8,6 @@
 #include <SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_mixer.h>
-#include <SDL2/SDL_ttf.h>
 
 #include "util.h"
 #include "entity.h"
@@ -16,7 +15,6 @@
 #include "level.h"
 #include "input.h"
 
-TextureData ballTD;
 std::map <std::string, TextureData> blockTDs;
 TextureData explosionTD;
 TextureData playerTD;
@@ -24,14 +22,17 @@ TextureData heart_fullTD;
 TextureData heart_emptyTD;
 TextureData goombaTD;
 
-static Mix_Chunk *bounceSound;
-static Mix_Chunk *hitSounds[3];
-static Mix_Chunk *failSound;
 void initTextures() {
+	blockTDs["dirt"] = TextureDataCreate("res/dirt.png");
+	blockTDs["stone"] = TextureDataCreate("res/stone.png");
+	blockTDs["sand"] = TextureDataCreate("res/sand.png");
+	blockTDs["sandstone"] = TextureDataCreate("res/sandstone.png");
+	blockTDs["sandstone_bg"] = TextureDataCreate("res/sandstone_bg.png");
+
+	for(auto it=blockTDs.begin(); it != blockTDs.end(); ++it) {
+		SDL_SetTextureBlendMode(it->second.texture, SDL_BLENDMODE_NONE);
+	}
 	
-	ballTD = TextureDataCreate("res/ball.png");
-	blockTDs[BLOCK_DIRT] = TextureDataCreate("res/block.png");
-	blockTDs[BLOCK_STONE] = TextureDataCreate("res/block_tough.png");
 	goombaTD = TextureDataCreate("res/goomba.png");
 
 	explosionTD.texture = IMG_LoadTexture(renderer, "res/explosion_50.png");
@@ -44,12 +45,6 @@ void initTextures() {
 	
 	heart_fullTD = TextureDataCreate("res/heart_full.png");
 	heart_emptyTD = TextureDataCreate("res/heart_empty.png");
-
-	bounceSound = Mix_LoadWAV("res/sounds/bounce.ogg");
-	hitSounds[0] = Mix_LoadWAV("res/sounds/hit1.wav");
-	hitSounds[1] = Mix_LoadWAV("res/sounds/hit2.wav");
-	hitSounds[2] = Mix_LoadWAV("res/sounds/hit3.wav");
-	failSound = Mix_LoadWAV("res/sounds/fail.ogg");
 }
 
 TextureData TextureDataCreate(const char texturePath[], const char leftPath[], const char rightPath[]) {
@@ -69,10 +64,10 @@ TextureData TextureDataCreate(const char texturePath[], const char leftPath[], c
 	return data;
 }
 
-Entity::Entity(TextureData &texdata, int x, int y) : Drawable(texdata, x, y) {
+Entity::Entity(TextureData &texdata, int x, int y, RenderLayer rl) : Drawable(texdata, x, y) {
 	this->pos = (Vector) {(double) x,(double) y};
 	this->collision = 0;
-	this->collisionSize = (this->rect.w + this->rect.h) / 4; // Average of widthheight / 2
+	this->collisionSize = (this->rect.w + this->rect.h) / 2; // Average of widthheight / 2
 	this->damage = 0;
 	this->health = 0;
 	this->deathTime = 0;
@@ -81,12 +76,9 @@ Entity::Entity(TextureData &texdata, int x, int y) : Drawable(texdata, x, y) {
 	
 	this->collision = 1;
 	this->health = 100;
-	this->renderLayer = RL_BACKGROUND;
+	this->renderLayer = rl;
 	
 	ents[entsC++] = this;
-	this->SetupRenderLayer();
-}
-void Entity::SetupRenderLayer() {
 	renderLayers[this->renderLayer][renderLayersC[this->renderLayer]++] = this;
 }
 
@@ -128,7 +120,7 @@ void Entity::GC() {
 void Entity::Draw(double dt) {
 	this->rect.x = this->pos.x - camera.x;
 	this->rect.y = this->pos.y - camera.y;
-	int ret;
+	static int ret;
 	//if(this->type == TYPE_BALL || this->type == TYPE_PLAYER) { // For some reason, it didn't like switching between the methods on a per-entity basis (using ent->ang != 0)
 	//	ret = SDL_RenderCopyEx(renderer, this->texture, this->GetFrame(dt), &this->rect, this->ang, NULL, SDL_FLIP_NONE);
 	//} else{
@@ -167,7 +159,7 @@ int Entity::ContainsPoint(double x, double y) {
 		y > this->pos.y);
 }
 
-PhysicsEntity::PhysicsEntity(TextureData &texdata, int x, int y) : Entity(texdata, x, y) {
+PhysicsEntity::PhysicsEntity(TextureData &texdata, int x, int y, RenderLayer rl) : Entity(texdata, x, y, rl) {
 	this->vel = (Vector) {0,0};
 	this->onGround = 0;
 	this->jumpTime = 0;
@@ -187,8 +179,8 @@ Entity* PhysicsEntity::CollisionMovement(Direction &collideDir, double dt) {
 	Vector points[9] = {
 		{(double) this->rect.w/2, 0}, // Top (1 point)
 		{(double) this->rect.w/4, (double) this->rect.h}, {(double) this->rect.w * (3.0d/4), (double) this->rect.h}, // Bottom (2 points)
-		{0, (double) this->rect.h/4}, {0, (double) this->rect.h/2}, {0, (double) this->rect.h * (3.0d/4)}, // Left (3 points)
-		{(double) this->rect.w, (double) this->rect.h/4}, {(double) this->rect.w, (double) this->rect.h/2}, {(double) this->rect.w, (double) this->rect.h * (3.0d/4)} // Right (3 points)
+		{0, (double) this->rect.h/4}, {0, (double) this->rect.h/2}, {0, (double) this->rect.h * (2.0d/3)}, // Left (3 points)
+		{(double) this->rect.w, (double) this->rect.h/4}, {(double) this->rect.w, (double) this->rect.h/2}, {(double) this->rect.w, (double) this->rect.h * (2.0d/3)} // Right (3 points)
 	};
 		
 	double originalMoveX, originalMoveY, nextMoveX, nextMoveY;
@@ -198,6 +190,7 @@ Entity* PhysicsEntity::CollisionMovement(Direction &collideDir, double dt) {
 	Entity* hit;
 	for (int enti = 0; enti < entsC; enti++) {
 		if(ents[enti] == NULL || ents[enti]->collision == 0 || this == ents[enti]) continue;
+		if(ents[enti]->Distance(this) > (ents[enti]->collisionSize + this->collisionSize)) continue;
 		// Test the four possible directions of player movement individually (0 = top, 1 = bottom, 2 = left, 3 = right)
 		for (int dir = 0; dir < 4; dir++) {
 			// Skip the test if the expected direction of movement makes the test irrelevant

@@ -16,10 +16,10 @@
 
 SDL_Renderer *renderer;
 
-Entity *ents[512];
+Entity *ents[MAX_ENTITIES];
 int entsC = 0;
 
-Drawable *renderLayers[RL_MAX][512];
+Drawable *renderLayers[RL_MAX][MAX_ENTITIES];
 int renderLayersC[RL_MAX];
 
 int WIDTH, HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, WIDTH_OFFSET, HEIGHT_OFFSET;
@@ -80,9 +80,10 @@ int main(int argc, char *argv[]) {
 		// Drawing
 		drawBackground(renderer, dt);
 		for(int rli=0; rli<RL_MAX; rli++){
+			Drawable** layer = renderLayers[rli];
 			for(int enti=0; enti<renderLayersC[rli]; enti++) {
-				if(renderLayers[rli][enti] == NULL) continue;
-				renderLayers[rli][enti]->Draw(dt);
+				if(layer[enti] == NULL) continue;
+				layer[enti]->Draw(dt);
 			}
 		}
 		

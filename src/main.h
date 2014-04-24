@@ -7,10 +7,10 @@ class Player;
 
 extern SDL_Renderer *renderer;
 
-extern Entity *ents[512];
+extern Entity *ents[MAX_ENTITIES];
 extern int entsC;
 
-extern Drawable *renderLayers[RL_MAX][512];
+extern Drawable *renderLayers[RL_MAX][MAX_ENTITIES];
 extern int renderLayersC[RL_MAX];
 
 extern int quit;

@@ -8,13 +8,12 @@ typedef struct {
 	double x, y;
 } Vector;
 
+const int BLOCK_SIZE = 24;
+const int MAX_ENTITIES = 8192;
 const int MAX_COLLISION_ITERATIONS = 3;
 const int INTERACT_RANGE = 50;
 const int INTERACT_DISPLACEMENT = 20;
 const int MAX_HP = 5;
-
-static std::string BLOCK_DIRT = "dirt";
-static std::string BLOCK_STONE = "stone";
 
 typedef struct {
 	SDL_Texture *texture;
@@ -51,6 +50,7 @@ static const std::string actionLookup[] = {
 enum RenderLayer{
 	RL_BACKGROUND,
 	RL_FOREGROUND,
+	RL_FOREGROUND2,
 	RL_HUD,
 	RL_MAX
 };
@@ -84,9 +84,8 @@ struct Entity : Drawable {
 	Action action;
 	Direction facing;
 	
-	Entity (TextureData &texdata, int x, int y);
+	Entity (TextureData &texdata, int x, int y, RenderLayer rl=RL_BACKGROUND);
 	~Entity ();
-	virtual void SetupRenderLayer();
 	void Draw(double dt);
 	virtual void Update(double dt);
 	static void GC();
@@ -107,7 +106,7 @@ struct PhysicsEntity : Entity {
 	double jumpTime;
 	int patrolling;
 	
-	PhysicsEntity(TextureData &texdata, int x, int y);
+	PhysicsEntity(TextureData &texdata, int x, int y, RenderLayer rl=RL_BACKGROUND);
 	Entity* CollisionMovement(Direction &dir, double dt);
 	void Movement(double dt);
 	void moveForward();
