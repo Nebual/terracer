@@ -129,10 +129,9 @@ bool loadJSONLevel(int level, Json::Value &root) {
 }
 
 void drawBackground(SDL_Renderer *renderer, double dt) {
-	const SDL_Rect rect = {0,0,WIDTH,HEIGHT};
 	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
 	SDL_SetRenderDrawColor(renderer, 20,20,20, SDL_ALPHA_OPAQUE);
-	SDL_RenderFillRect(renderer, &rect);
+	SDL_RenderFillRect(renderer, NULL);
 }
 
 

@@ -7,7 +7,7 @@ EXTERNALSOURCES=jsoncpp.cpp
 
 CC=g++
 C99MODE=-std=c++0x
-EXTRACFLAGS=-g $(C99MODE) -Wuninitialized -Wmissing-field-initializers
+EXTRACFLAGS=-g $(C99MODE) -Wuninitialized -Wmissing-field-initializers -Og
 
 debug: EXTRACFLAGS +=-DDEBUG -g
 warn: EXTRACFLAGS += -Wall -Wextra
@@ -31,7 +31,7 @@ run: win32
 else
 # Building on Linux
 WINFOLDER:=/usr/x86_64-w64-mingw32/
-CFLAGS=$(shell sdl2-config --cflags) $(EXTRACFLAGS) -Iexternals/include
+CFLAGS=$(shell sdl2-config --cflags) $(EXTRACFLAGS) -Iexternals/include -march=native
 LIBS=$(shell sdl2-config --libs) $(EXTRALIBS)
 
 all: compile
