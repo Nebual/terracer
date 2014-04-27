@@ -27,7 +27,7 @@ all: win32
 win32: compile
 run: win32
 	@echo
-	./$(EXECUTABLE)
+	./$(EXECUTABLE).exe
 else
 # Building on Linux
 WINFOLDER:=/usr/x86_64-w64-mingw32/

@@ -19,4 +19,6 @@ struct Player : PhysicsEntity {
 	void HandleCollision(Direction collideDir, double dt);
 };
 
+void initInput();
+
 #endif

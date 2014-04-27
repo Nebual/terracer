@@ -42,6 +42,7 @@ int main(int argc, char *argv[]) {
 	initVariables(WIDTH, HEIGHT);
 	initTextures();
 	initFonts();
+	initInput();
 	//initHUD();
 
 	generateLevel(FIRSTLEVEL);

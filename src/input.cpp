@@ -13,6 +13,15 @@
 #include "input.h"
 #include "level.h"
 
+static Mix_Chunk *jumpSounds[5];
+void initInput() {
+	char filepath[] = "res/sounds/jump1.wav";
+	for(int i=1; i<=5; i++) {
+		sprintf(filepath, "res/sounds/jump%d.wav", i);
+		jumpSounds[i-1] = Mix_LoadWAV(filepath);
+	}
+}
+
 Player::Player(TextureData &texdata, int x, int y) : PhysicsEntity(texdata, x, y, RL_FOREGROUND2) {
 	this->collision = 1;
 	this->health = 1;
@@ -63,6 +72,7 @@ void Player::HandleKeyboard(double dt) {
 						break;
 					case SDLK_SPACE:
 						if(ply->onGround) {
+							playSound(jumpSounds[rand() % 5]);
 							ply->jumpTime = 0.000000001;
 							ply->vel.y = -275;
 						}
