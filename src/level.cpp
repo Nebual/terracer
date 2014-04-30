@@ -11,7 +11,7 @@
 
 #include "entity.h"
 #include "main.h"
-#include "input.h"
+#include "player.h"
 #include "level.h"
 #include "util.h"
 

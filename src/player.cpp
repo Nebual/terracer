@@ -7,7 +7,7 @@
 
 #include "util.h"
 #include "main.h"
-#include "input.h"
+#include "player.h"
 #include "level.h"
 
 static Mix_Chunk *jumpSounds[5];

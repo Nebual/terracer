@@ -11,7 +11,7 @@
 #include "util.h"
 #include "entity.h"
 #include "level.h"
-#include "input.h"
+#include "player.h"
 
 std::map <std::string, TextureData> blockTDs;
 TextureData explosionTD;

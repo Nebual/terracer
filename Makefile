@@ -2,12 +2,12 @@ EXECUTABLE=terracer
 EXTRALIBS=-lSDL2_image -lm -lSDL2_ttf -lSDL2_mixer
 
 #SOURCES=src/main.c $(wildcard src/*.c)
-SOURCES=entity.cpp input.cpp main.cpp level.cpp util.cpp common.cpp thing.cpp
+SOURCES=entity.cpp player.cpp main.cpp level.cpp util.cpp common.cpp
 EXTERNALSOURCES=jsoncpp.cpp
 
 CC=g++
 C99MODE=-std=c++0x
-EXTRACFLAGS=-g $(C99MODE) -Wuninitialized -Wmissing-field-initializers -Og
+EXTRACFLAGS=-g $(C99MODE) -Wuninitialized -Wmissing-field-initializers -O2
 
 debug: EXTRACFLAGS +=-DDEBUG -g
 warn: EXTRACFLAGS += -Wall -Wextra

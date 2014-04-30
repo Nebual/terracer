@@ -12,7 +12,7 @@
 #include "entity.h"
 #include "level.h"
 #include "main.h"
-#include "input.h"
+#include "player.h"
 
 int FIRSTLEVEL = 1;
 int quit = 0;
