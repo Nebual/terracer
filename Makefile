@@ -2,7 +2,7 @@ EXECUTABLE=terracer
 EXTRALIBS=-lSDL2_image -lm -lSDL2_ttf -lSDL2_mixer
 
 #SOURCES=src/main.c $(wildcard src/*.c)
-SOURCES=entity.cpp input.cpp main.cpp level.cpp util.cpp
+SOURCES=entity.cpp input.cpp main.cpp level.cpp util.cpp common.cpp thing.cpp
 EXTERNALSOURCES=jsoncpp.cpp
 
 CC=g++

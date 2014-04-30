@@ -2,13 +2,10 @@
 #include <sys/time.h>
 #include <math.h>
 
-#include <SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_mixer.h>
 
-
 #include "util.h"
-#include "entity.h"
 #include "main.h"
 #include "input.h"
 #include "level.h"

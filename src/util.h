@@ -1,6 +1,8 @@
 #ifndef __UTIL_H
 #define __UTIL_H
 
+#include "common.h"
+
 extern SDL_Color WHITE;
 
 void initFonts();

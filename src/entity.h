@@ -1,21 +1,9 @@
 #ifndef __ENTITY_H
 #define __ENTITY_H
 
-#include <map>
-#include <string>
+#include "common.h"
 
-typedef struct {
-	double x, y;
-} Vector;
-
-const int BLOCK_SIZE = 24;
-const int MAX_ENTITIES = 8192;
-const int MAX_COLLISION_ITERATIONS = 3;
-const int INTERACT_RANGE = 50;
-const int INTERACT_DISPLACEMENT = 20;
-const int MAX_HP = 5;
-
-typedef struct {
+struct TextureData {
 	SDL_Texture *texture;
 	SDL_Texture *left;
 	SDL_Texture *right;
@@ -24,38 +12,7 @@ typedef struct {
 	short int animDuration;
 	int w;
 	int h;
-} TextureData;
-
-enum Direction {
-	UP = 1,
-	DOWN = 2,
-	LEFT = 4,
-	RIGHT = 8
 };
-
-enum Action {
-	NO_ACTION,
-	PLY_HEALTH_UP,
-	PLY_SPEED_UP,
-	PLY_LIVES_UP,
-	MAX_ACTIONS
-};
-static const std::string actionLookup[] = {
-	"NO_ACTION",
-	"PLY_HEALTH_UP",
-	"PLY_SPEED_UP",
-	"PLY_LIVES_UP"
-};
-
-enum RenderLayer{
-	RL_BACKGROUND,
-	RL_FOREGROUND,
-	RL_FOREGROUND2,
-	RL_HUD,
-	RL_MAX
-};
-
-Direction operator|(Direction a, Direction b);
 
 struct Drawable {
 	SDL_Rect rect;
@@ -124,13 +81,9 @@ struct Hud{
 	void fillHearts();
 };
 
-extern std::map <std::string, TextureData> blockTDs;
-extern TextureData goombaTD;
-extern TextureData playerTD;
-
 void initTextures();
-
 TextureData TextureDataCreate(const char texturePath[], const char leftPath[] = "", const char rightPath[] = "");
+Direction operator|(Direction a, Direction b);
 
 
 #endif

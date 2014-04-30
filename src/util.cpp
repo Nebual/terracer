@@ -6,8 +6,6 @@
 #include <SDL2/SDL_mixer.h>
 #include <SDL2/SDL_ttf.h>
 
-#include "entity.h"
-#include "main.h"
 #include "util.h"
 
 TTF_Font *prototype;

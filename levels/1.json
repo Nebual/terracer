@@ -1,17 +1,17 @@
 {
   "tileset": {
-    "=": {
-      "texture": "dirt"
+    "W": {
+      "texture": "sandstone"
     },
-    "#": {
-      "texture": "stone",
+    "w": {
+	  "texture": "sandstone_bg",
       "collision": false
+	},
+    "S": {
+      "texture": "sand"
 	}
   },
   "entities": {
-    "(8,9)": {
-      "action": "PLY_HEALTH_UP",
-      "collision": false
-    }
+    
   }
 }

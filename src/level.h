@@ -9,7 +9,6 @@ struct Level {
 	Level();
 	Level(int inLevel);
 };
-extern Level *curLevel;
 
 extern char menuMode[];
 extern SDL_Texture *backgroundRLTexture;

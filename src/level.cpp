@@ -5,10 +5,8 @@
 #include <fstream>
 #include <algorithm>    // std::find
 
-#include <SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_mixer.h>
-#include <SDL2/SDL_ttf.h>
 #include "json/json.h"
 
 #include "entity.h"

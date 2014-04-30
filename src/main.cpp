@@ -3,32 +3,19 @@
 #include <math.h>
 #include <getopt.h>
 
-#include <SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_mixer.h>
 #include <SDL2/SDL_ttf.h>
 
+#include "common.h"
 #include "util.h"
 #include "entity.h"
 #include "level.h"
 #include "main.h"
 #include "input.h"
 
-SDL_Renderer *renderer;
-
-Entity *ents[MAX_ENTITIES];
-int entsC = 0;
-
-Drawable *renderLayers[RL_MAX][MAX_ENTITIES];
-int renderLayersC[RL_MAX];
-
-int WIDTH, HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, WIDTH_OFFSET, HEIGHT_OFFSET;
 int FIRSTLEVEL = 1;
-Player *ply;
-SDL_Rect camera = {0,0,0,0};
 int quit = 0;
-
-Hud *hud;
 
 void initVariables(int w, int h) {
 	camera.w = WIDTH;
