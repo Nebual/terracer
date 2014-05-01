@@ -16,6 +16,7 @@
 
 int FIRSTLEVEL = 1;
 int quit = 0;
+int nextlevel = 0;
 
 void initVariables(int w, int h) {
 	camera.w = WIDTH;
@@ -33,7 +34,6 @@ int main(int argc, char *argv[]) {
 
 	generateLevel(FIRSTLEVEL);
 	
-	ply = new Player(playerTD, WIDTH/2 - 50, 180);
 	hud = new Hud();
 	
 	PhysicsEntity *goomba = new PhysicsEntity(goombaTD, 500, 50);
@@ -55,6 +55,11 @@ int main(int argc, char *argv[]) {
 
 		// ===================
 		// Update
+		if(nextlevel) {
+			printf("Switching to level %d\n", nextlevel);
+			generateLevel(nextlevel);
+			nextlevel = 0;
+		}
 		TimerRun();
 		for(int enti=0; enti<entsC; enti++) {
 			if(ents[enti] == NULL) continue;

@@ -8,7 +8,7 @@ struct Player : PhysicsEntity {
 	Player (TextureData &texdata, int x, int y);
 	void Update(double dt);
 	void HandleKeyboard(double dt);
-	void HandleCollision(Direction collideDir, double dt);
+	void HandleCollision(Entity* hit, Direction collideDir, double dt);
 };
 
 void initInput();

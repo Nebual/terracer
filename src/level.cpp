@@ -5,6 +5,7 @@
 #include <fstream>
 #include <algorithm>    // std::find
 #include <sstream>
+#include <typeinfo>
 
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_mixer.h>
@@ -29,10 +30,17 @@ void checkWinLoss(){
 
 void setEntityProperties(Entity* ent, Json::Value info) {
 	if(!!info["collision"]) {ent->collision = info["collision"].asBool();}
-	/*if(!!info["action"]) {
+	if(!!info["action"]) {
+		if(info["action"].asString() == "PLAYERSPAWN") {
+			ply = new Player(playerTD, ent->pos.x, ent->pos.y - BLOCK_SIZE*3);
+			camera.x = ent->pos.x; camera.y = ent->pos.y;
+			delete ent;
+			return;
+		}
 		ent->action = (Action) (std::find(actionLookup, actionLookup + MAX_ACTIONS, info["action"].asString()) - actionLookup);
 		if(ent->action == MAX_ACTIONS) {ent->action = NO_ACTION; printf("Ent properties error: no such action '%s'!\n", info["action"].asCString());}
-	}*/
+	}
+	if(!!info["idata"]) {ent->iData = info["idata"].asInt();}
 }
 
 Level *curLevel;
@@ -42,14 +50,29 @@ Level::Level(int inLevel) {
 	this->id = inLevel;
 }
 
+Entity* constructEntity(Json::Value tileinfo, int x, int y) {
+	Entity *ent;
+	// Note: Anything with RL_BACKGROUND will be compiled into backgroundRLTexture once at startup,
+	// so be sure to set anything that moves to RL_FOREGROUND
+	RenderLayer rl = tileinfo.get("static", true).asBool() ? RL_BACKGROUND : RL_FOREGROUND;
+	std::string className = tileinfo.get("class","").asString();
+	//std::ostringstream sPos; sPos << "(" << x << "," << y << ")";
+	//if(className == "" && (!!tileset[blockC]["action"] || (!!customEntities[sPos.str()] && !!customEntities[sPos.str()]["action"]))) {className = "interactable";}
+	
+	if(className == "interactable") {
+		ent = new Interactable(blockTDs[tileinfo.get("texture","").asString()], x*BLOCK_SIZE, y*BLOCK_SIZE, rl);
+	} else {
+		ent = new Entity(blockTDs[tileinfo.get("texture","").asString()], x*BLOCK_SIZE, y*BLOCK_SIZE, rl);
+	}
+	return ent;
+}
+
 void generateLevel(int level) {
 	strcpy(menuMode, "");
 	
 	for(int enti=0; enti<entsC; enti++) {
 		if(ents[enti] == NULL) continue;
-		if(dynamic_cast<const Player*>(ents[enti]) == 0){ // Delete everything but the player
-			delete ents[enti];
-		}
+		delete ents[enti];
 	}
 	Entity::GC();
 
@@ -85,15 +108,8 @@ void generateLevel(int level) {
 			blockC[0] = line[x];
 			if(!!tileset[blockC]) {
 				if(DEBUG) printf("Spawning block(%d,%d) type(%d,%c)\n", x, y, line[x], line[x]);
-				// Note: Anything with RL_BACKGROUND will be compiled into backgroundRLTexture once at startup,
-				// so be sure to set anything that moves to RL_FOREGROUND
-				RenderLayer rl = tileset[blockC].get("static", true).asBool() ? RL_BACKGROUND : RL_FOREGROUND;
-				std::ostringstream sPos; sPos << "(" << x << "," << y << ")";
-				if(!!tileset[blockC]["action"] || (!!customEntities[sPos.str()] && !!customEntities[sPos.str()]["action"])) {
-					ent = new Interactable(blockTDs[tileset[blockC]["texture"].asString()], x*BLOCK_SIZE, y*BLOCK_SIZE, rl);
-				} else {
-					ent = new Entity(blockTDs[tileset[blockC]["texture"].asString()], x*BLOCK_SIZE, y*BLOCK_SIZE, rl);
-				}
+				
+				ent = constructEntity(tileset[blockC], x, y);
 				posLookup[x][y] = ent; // TODO: Remove from list, ensure consistency across block movements
 				setEntityProperties(ent, tileset[blockC]);
 
@@ -108,8 +124,6 @@ void generateLevel(int level) {
 	curLevel->w = max((biggestX+1)*BLOCK_SIZE, WIDTH);
 	curLevel->h = max((biggestY+1)*BLOCK_SIZE, HEIGHT);
 
-	compileBackground(renderer);
-	
 	char sPos[20];
 	for(Json::ValueIterator iter = customEntities.begin(); iter != customEntities.end(); iter++ ) {
 		strncpy(sPos, iter.memberName(), sizeof(sPos)-1);
@@ -122,6 +136,8 @@ void generateLevel(int level) {
 		if(DEBUG) printf("Applying Entity(%d,%d) specifics...\n", x, y);
 		setEntityProperties(ent, *iter);
 	}
+
+	compileBackground(renderer);
 }
 
 bool loadJSONLevel(int level, Json::Value &root) {
@@ -137,7 +153,8 @@ bool loadJSONLevel(int level, Json::Value &root) {
 }
 
 void compileBackground(SDL_Renderer *renderer) {
-	free(backgroundRLTexture);
+	SDL_DestroyTexture(backgroundRLTexture);
+	
 	backgroundRLTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET, curLevel->w, curLevel->h);
 	SDL_SetTextureBlendMode(backgroundRLTexture, SDL_BLENDMODE_NONE);
 	SDL_SetRenderTarget(renderer, backgroundRLTexture);

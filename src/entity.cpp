@@ -80,6 +80,7 @@ Entity::Entity(TextureData &texdata, int x, int y, RenderLayer rl) : Drawable(te
 	this->damage = 0;
 	this->health = 100;
 	this->deathTime = 0;
+	this->action = NO_ACTION;
 	this->facing = RIGHT;
 	
 	this->renderLayer = rl;
@@ -353,7 +354,7 @@ void PhysicsEntity::Update(double dt) {
 		collideDir = (Direction) 0;
 		Entity *hit = this->CollisionMovement(collideDir, dt);
 		if(hit == NULL) { break; }
-		this->HandleCollision(collideDir, dt);
+		this->HandleCollision(hit, collideDir, dt);
 	}
 	this->Movement(dt);
 	if(patrolling){this->moveForward();}
@@ -378,7 +379,7 @@ void PhysicsEntity::moveForward(){
 	}
 }
 
-void PhysicsEntity::HandleCollision(Direction collideDir, double dt) {
+void PhysicsEntity::HandleCollision(Entity* hit, Direction collideDir, double dt) {
 	if(collideDir & DOWN) this->onGround = 1;	
 	if(this->patrolling){
 		if(! this->onGround || collideDir == LEFT || collideDir == RIGHT){ //we're falling, or we hit a wall
@@ -479,7 +480,6 @@ void Hud::Draw(double dt){
 /* ================= */
 
 Interactable::Interactable(TextureData &texdata, int x, int y, RenderLayer rl) : Entity(texdata, x, y, rl){
-	this->action = NO_ACTION;
 	this->target = NULL;
 }
 

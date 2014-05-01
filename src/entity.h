@@ -38,6 +38,8 @@ struct Entity : Drawable {
 	short int damage;			// Projectiles
 	short int health;			// Ships
 
+	Action action;
+	int iData;
 	Direction facing;
 	
 	Entity (TextureData &texdata, int x, int y, RenderLayer rl=RL_FOREGROUND);
@@ -68,7 +70,7 @@ struct PhysicsEntity : Entity {
 	void Movement(double dt);
 	void moveForward();
 	virtual void Update(double dt);
-	virtual void HandleCollision(Direction collideDir, double dt);
+	virtual void HandleCollision(Entity* hit, Direction collideDir, double dt);
 };
 
 struct Hud{
@@ -87,7 +89,6 @@ struct Door{
 };
 
 struct Interactable : Entity{
-	Action action;
 	Entity *target;
 	
 	Interactable(TextureData &texdata, int x, int y, RenderLayer rl=RL_FOREGROUND);

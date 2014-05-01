@@ -23,8 +23,11 @@ Player::Player(TextureData &texdata, int x, int y) : PhysicsEntity(texdata, x, y
 	this->collision = 1;
 	this->health = 1;
 }
-void Player::HandleCollision(Direction collideDir, double dt) {
+void Player::HandleCollision(Entity* hit, Direction collideDir, double dt) {
 	if(collideDir & DOWN) this->onGround = 1;
+	if(hit->action == SWITCH_LEVEL) {
+		nextlevel = hit->iData;
+	}
 }
 void Player::Update(double dt) {
 	this->HandleKeyboard(dt);

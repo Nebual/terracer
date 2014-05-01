@@ -63,13 +63,15 @@ enum Action {
 	PLY_HEALTH_UP,
 	PLY_SPEED_UP,
 	PLY_LIVES_UP,
+	SWITCH_LEVEL,
 	MAX_ACTIONS
 };
 static const std::string actionLookup[] = {
 	"NO_ACTION",
 	"PLY_HEALTH_UP",
 	"PLY_SPEED_UP",
-	"PLY_LIVES_UP"
+	"PLY_LIVES_UP",
+	"SWITCH_LEVEL"
 };
 
 enum RenderLayer{

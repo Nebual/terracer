@@ -28,6 +28,8 @@ win32: compile
 run: win32
 	@echo
 	./$(EXECUTABLE).exe
+gdb: debug
+	gdb --eval-command=run --args ./$(EXECUTABLE)
 else
 # Building on Linux
 WINFOLDER:=/usr/x86_64-w64-mingw32/

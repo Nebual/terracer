@@ -9,9 +9,11 @@
 	},
     "S": {
       "texture": "sand"
-	}
+	},
+    "E": {"texture": "entity"}
   },
   "entities": {
-    
+    "(1, 34)": {"action":"PLAYERSPAWN"},
+    "(75, 22)": {"action":"SWITCH_LEVEL","idata": 2, "collision": true}
   }
 }
