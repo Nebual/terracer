@@ -22,11 +22,25 @@ void initInput() {
 Player::Player(TextureData &texdata, int x, int y) : PhysicsEntity(texdata, x, y, RL_FOREGROUND2) {
 	this->collision = 1;
 	this->health = 1;
+	for(int i=0; i<9; i++) {
+		this->collisionPoints[i].x = genericCollisionPoints[i].x * 42 + 10;
+		this->collisionPoints[i].y = genericCollisionPoints[i].y * this->rect.h;
+	}
 }
 void Player::HandleCollision(Entity* hit, Direction collideDir, double dt) {
 	if(collideDir & DOWN) this->onGround = 1;
 	if(hit->action == SWITCH_LEVEL) {
 		nextlevel = hit->iData;
+	}
+}
+void Player::SetAnimation(Animation newAnim) {
+	switch(newAnim) {
+		case ANIM_NORMAL:
+			this->animMaxFrames = 0;
+			break;
+		case ANIM_WALKING:
+			this->animMaxFrames = 4;
+			break;
 	}
 }
 void Player::Update(double dt) {
@@ -97,20 +111,25 @@ void Player::HandleKeyboard(double dt) {
 		if(keysPressed[SDL_SCANCODE_A] || keysPressed[SDL_SCANCODE_LEFT]) {
 			ply->vel.x = -PLAYER_MAX_SPEED;
 			ply->face(LEFT);
+			ply->SetAnimation(ANIM_WALKING);
 		}
 		else if(keysPressed[SDL_SCANCODE_D] || keysPressed[SDL_SCANCODE_RIGHT]) {
 			ply->vel.x = PLAYER_MAX_SPEED;
 			ply->face(RIGHT);
+			ply->SetAnimation(ANIM_WALKING);
 		}
 		else {
 			ply->vel.x = 0;
+			ply->SetAnimation(ANIM_NORMAL);
 		}
 	} else {
 		if(keysPressed[SDL_SCANCODE_A] || keysPressed[SDL_SCANCODE_LEFT]) {
 			ply->vel.x = max(ply->vel.x - PLAYER_AIR_ACCEL*dt, -PLAYER_MAX_SPEED);
+			ply->SetAnimation(ANIM_WALKING);
 		}
 		else if(keysPressed[SDL_SCANCODE_D] || keysPressed[SDL_SCANCODE_RIGHT]) {
 			ply->vel.x = min(ply->vel.x + PLAYER_AIR_ACCEL*dt, PLAYER_MAX_SPEED);
+			ply->SetAnimation(ANIM_WALKING);
 		}
 		else {
 			ply->vel.x -= sign(ply->vel.x) * PLAYER_AIR_ACCEL/2*dt;

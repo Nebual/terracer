@@ -7,6 +7,7 @@
 struct Player : PhysicsEntity {
 	Player (TextureData &texdata, int x, int y);
 	void Update(double dt);
+	void SetAnimation(Animation newAnim);
 	void HandleKeyboard(double dt);
 	void HandleCollision(Entity* hit, Direction collideDir, double dt);
 };

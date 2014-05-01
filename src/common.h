@@ -82,6 +82,13 @@ enum RenderLayer{
 	RL_MAX
 };
 
+enum Animation {
+	ANIM_NORMAL,
+	ANIM_WALKING,
+	ANIM_JUMPING,
+	ANIM_MAX
+};
+
 
 /* ================= */
 /* Varbles           */

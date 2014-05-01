@@ -9,7 +9,7 @@ struct TextureData {
 	SDL_Texture *right;
 	short int animMaxFrames;
 	short int animWidth;
-	short int animDuration;
+	double animDuration;
 	int w;
 	int h;
 };
@@ -63,6 +63,7 @@ struct PhysicsEntity : Entity {
 	int onGround;
 	double jumpTime;
 	int patrolling;
+	static Vector genericCollisionPoints[9];
 	Vector collisionPoints[9];
 	
 	PhysicsEntity(TextureData &texdata, int x, int y, RenderLayer rl=RL_FOREGROUND);
@@ -96,6 +97,7 @@ struct Interactable : Entity{
 };
 
 void initTextures();
+TextureData& getTexture(std::string k);
 TextureData TextureDataCreate(const char texturePath[], const char leftPath[] = "", const char rightPath[] = "");
 Direction operator|(Direction a, Direction b);
 

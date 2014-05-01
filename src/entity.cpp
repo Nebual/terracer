@@ -20,6 +20,7 @@
 
 
 std::map <std::string, TextureData> blockTDs;
+
 TextureData& getTexture(std::string k) {
 	if(blockTDs.count(k) != 0) return blockTDs.at(k);
 	blockTDs[k] = TextureDataCreate(("res/" + k + ".png").c_str());
@@ -35,6 +36,11 @@ void initTextures() {
 	explosionTD.animDuration = 2;
 	
 	blockTDs["player"] = TextureDataCreate("res/player_right.png", "res/player_left.png", "res/player_right.png");
+	blockTDs["player"].animMaxFrames = 4;
+	blockTDs["player"].w = 60;
+	blockTDs["player"].h = 80;
+	blockTDs["player"].animWidth = 4;
+	blockTDs["player"].animDuration = 0.75;
 }
 
 TextureData TextureDataCreate(const char texturePath[], const char leftPath[], const char rightPath[]) {
@@ -227,18 +233,17 @@ void Entity::face(Direction newDirection) {
 /*  PhysicsEntity 	 */
 /* ================= */
 
-
+Vector PhysicsEntity::genericCollisionPoints[9] = {
+				{0.50d, 0}, 			// Top (1 point)
+	{0.25d, 1},				{0.75d, 1}, // Bottom (2 points)
+	{0, 0.25d}, {0, 0.50d}, {0, 2/3.0d},// Left (3 points)
+	{1, 0.25d}, {1, 0.50d}, {1, 2/3.0d} // Right (3 points)
+};
 PhysicsEntity::PhysicsEntity(TextureData &texdata, int x, int y, RenderLayer rl) : Entity(texdata, x, y, rl) {
 	this->vel = (Vector) {0,0};
 	this->onGround = 0;
 	this->jumpTime = 0;
 	this->patrolling = 0;
-	static Vector genericCollisionPoints[9] = {
-					{0.50d, 0}, 			// Top (1 point)
-		{0.25d, 1}, 			{0.75d, 1}, // Bottom (2 points)
-		{0, 0.25d}, {0, 0.50d}, {0, 2/3.0d},// Left (3 points)
-		{1, 0.25d}, {1, 0.50d}, {1, 2/3.0d} // Right (3 points)
-	};
 	for(int i=0; i<9; i++) {
 		this->collisionPoints[i].x = genericCollisionPoints[i].x * this->rect.w;
 		this->collisionPoints[i].y = genericCollisionPoints[i].y * this->rect.h;
@@ -393,8 +398,8 @@ Drawable::Drawable(TextureData &texdata, int x, int y) {
 	this->texdata = &texdata;
 	this->rect = (SDL_Rect) {x,y,texdata.w,texdata.h};
 	this->animTime = 0;
-	this->animDuration = 0;
-	this->animMaxFrames = 0;
+	this->animDuration = texdata.animDuration;
+	this->animMaxFrames = texdata.animMaxFrames;
 	this->renderLayer = RL_FOREGROUND;
 }
 
@@ -411,9 +416,9 @@ SDL_Rect* Drawable::GetFrame(double dt) {
 		
 		this->animTime += dt;
 		curFrame = this->animMaxFrames * (this->animTime / this->animDuration);
+		if(curFrame >= this->animMaxFrames) {this->animTime = 0; curFrame = 0;}
 		//printf("Test (%.4f, %.4f, %.4f, %d, %d)\n", ent->animTime, ent->animDuration, ent->animTime / ent->animDuration, ent->animMaxFrames, curFrame);
 		srcRect = (SDL_Rect) {this->rect.w * (curFrame % 8), this->rect.h * (curFrame / 8), this->rect.w, this->rect.h};
-		//if(ent->animFrame > ent->animFrameMax*4) {ent->animFrame = 0;}
 		return &srcRect;
 	}
 	return NULL;
