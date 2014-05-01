@@ -19,6 +19,8 @@ class TextureData;
 class Timer;
 class Level;
 class Hud;
+class Interactable;
+class Door;
 
 
 /* ================= */

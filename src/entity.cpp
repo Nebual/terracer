@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <sys/time.h>
 #include <math.h>
+#include <typeinfo>
 #ifdef _WIN32
 	#include <windows.h>
 #endif
@@ -12,6 +13,11 @@
 #include "entity.h"
 #include "level.h"
 #include "player.h"
+
+/* ================= */
+/*  	Textures   	 */
+/* ================= */
+
 
 std::map <std::string, TextureData> blockTDs;
 TextureData explosionTD;
@@ -62,6 +68,11 @@ TextureData TextureDataCreate(const char texturePath[], const char leftPath[], c
 	return data;
 }
 
+/* ================= */
+/*  	Entity   	 */
+/* ================= */
+
+
 Entity::Entity(TextureData &texdata, int x, int y, RenderLayer rl) : Drawable(texdata, x, y) {
 	this->pos = (Vector) {(double) x,(double) y};
 	this->collision = 1;
@@ -69,7 +80,6 @@ Entity::Entity(TextureData &texdata, int x, int y, RenderLayer rl) : Drawable(te
 	this->damage = 0;
 	this->health = 100;
 	this->deathTime = 0;
-	this->action = NO_ACTION;
 	this->facing = RIGHT;
 	
 	this->renderLayer = rl;
@@ -154,6 +164,81 @@ int Entity::ContainsPoint(double x, double y) {
 		y < (this->pos.y + this->rect.h) &&
 		y > this->pos.y);
 }
+
+void Entity::Damage(int damage) {
+	if(this->health <= 0) return;
+	this->health -= damage;
+	if(this->health <= 0) {
+		//this->type = TYPE_EXPLOSION;
+		this->texture = explosionTD.texture;
+		this->rect.w = explosionTD.w; this->rect.h = explosionTD.h;
+		this->pos.y -= 12;
+		this->animDuration = explosionTD.animDuration;
+		this->animMaxFrames = explosionTD.animMaxFrames;
+		this->collision = 0;
+		
+		this->DeathClock(explosionTD.animDuration * 1000);
+	}
+}
+void Entity::DeathClock(int delay) {
+	this->deathTime = SDL_GetTicks() + delay;
+}
+
+double Entity::Distance(Entity *ent2) {
+	return pow(pow(this->pos.x - ent2->pos.x, 2) + powf(this->pos.y - ent2->pos.y, 2), 0.5);
+}
+
+Interactable* Entity::closestInteractable(int minDist) {
+	Interactable *closest = NULL;
+	int dist = minDist;
+	for(int i=0; i<entsC; i++) {
+		if(ents[i] == NULL || this == ents[i]) {continue;}
+		if(dynamic_cast<Interactable*>(ents[i]) == NULL){continue;} //not an interactable object
+				
+		if(this->Distance(ents[i]) < dist) {
+			dist = this->Distance(ents[i]);
+			closest = (Interactable*) ents[i];
+		}
+	}
+	
+	return closest;
+}
+
+void Entity::interact() {
+	int displacement = INTERACT_RANGE;
+	
+	if(this->facing == RIGHT){
+		displacement = INTERACT_RANGE + INTERACT_DISPLACEMENT;
+	}else if(this->facing == LEFT){
+		displacement = INTERACT_RANGE - INTERACT_DISPLACEMENT;
+	}
+	
+	Interactable *closest = closestInteractable(displacement);
+	if(closest == NULL) {return;}
+	closest->use();
+											
+}
+
+void Entity::face(Direction newDirection) {
+	if(facing == newDirection) {
+		return;
+	}
+	facing = newDirection;
+	
+	switch(newDirection) {
+		case LEFT:
+			this->texture = this->texdata->left;
+			break;
+		case RIGHT:
+			this->texture = this->texdata->right;
+			break;
+	}
+}
+
+/* ================= */
+/*  PhysicsEntity 	 */
+/* ================= */
+
 
 PhysicsEntity::PhysicsEntity(TextureData &texdata, int x, int y, RenderLayer rl) : Entity(texdata, x, y, rl) {
 	this->vel = (Vector) {0,0};
@@ -308,86 +393,12 @@ void PhysicsEntity::HandleCollision(Direction collideDir, double dt) {
 	}
 }
 
-void Entity::Damage(int damage) {
-	if(this->health <= 0) return;
-	this->health -= damage;
-	if(this->health <= 0) {
-		//this->type = TYPE_EXPLOSION;
-		this->texture = explosionTD.texture;
-		this->rect.w = explosionTD.w; this->rect.h = explosionTD.h;
-		this->pos.y -= 12;
-		this->animDuration = explosionTD.animDuration;
-		this->animMaxFrames = explosionTD.animMaxFrames;
-		this->collision = 0;
-		
-		this->DeathClock(explosionTD.animDuration * 1000);
-	}
-}
-void Entity::DeathClock(int delay) {
-	this->deathTime = SDL_GetTicks() + delay;
-}
-
-double Entity::Distance(Entity *ent2) {
-	return pow(pow(this->pos.x - ent2->pos.x, 2) + powf(this->pos.y - ent2->pos.y, 2), 0.5);
-}
-
-void Entity::use(){
-	if(DEBUG){printf("Action executed: %d\n", this->action);}	
-	switch(this->action){
-		case PLY_HEALTH_UP:
-			ply->health += 1;
-			hud->fillHearts();
-			break;
-	}
-}
-
-Entity* Entity::closestInteractable(int minDist) {
-	Entity *closest = NULL;
-	int dist = minDist;
-	for(int i=0; i<entsC; i++) {
-		if(ents[i] == NULL || this == ents[i] || ents[i]->action == NO_ACTION) {continue;}
-
-		if(this->Distance(ents[i]) < dist) {
-			dist = this->Distance(ents[i]);
-			closest = ents[i];
-		}
-	}
-	
-	return closest;
-}
-
-void Entity::interact() {
-	int displacement = INTERACT_RANGE;
-	
-	if(this->facing == RIGHT){
-		displacement = INTERACT_RANGE + INTERACT_DISPLACEMENT;
-	}else if(this->facing == LEFT){
-		displacement = INTERACT_RANGE - INTERACT_DISPLACEMENT;
-	}
-	
-	Entity *closest = closestInteractable(displacement);
-	if(closest == NULL) {return;}
-	closest->use();
-}
-
-void Entity::face(Direction newDirection) {
-	if(facing == newDirection) {
-		return;
-	}
-	facing = newDirection;
-	
-	switch(newDirection) {
-		case LEFT:
-			this->texture = this->texdata->left;
-			break;
-		case RIGHT:
-			this->texture = this->texdata->right;
-			break;
-	}
-}
 
 inline Direction operator|(Direction a, Direction b) {return static_cast<Direction>(static_cast<int>(a) | static_cast<int>(b));}
 
+/* ================= */
+/*  Drawable	  	 */
+/* ================= */
 
 Drawable::Drawable(TextureData &texdata, int x, int y) {
 	this->texture = texdata.texture;
@@ -424,6 +435,10 @@ void Drawable::Draw(double dt) {
 	if(ret != 0) {printf("Render failed: %s\n", SDL_GetError());}
 }
 
+/* ================= */
+/*  HUD			   	 */
+/* ================= */
+
 Hud::Hud() {
 	for(int i = 0; i < MAX_HP; i++){
 		hearts[i] = new Drawable(heart_emptyTD, i*50, 0);
@@ -457,4 +472,19 @@ void Hud::Draw(double dt){
 	for(int i = 0; i < MAX_HP; i++) {
 		this->hearts[i]->Draw(dt);
 	}
+}
+
+/* ================= */
+/*  Interactable   	 */
+/* ================= */
+
+Interactable::Interactable(TextureData &texdata, int x, int y, RenderLayer rl) : Entity(texdata, x, y, rl){
+	this->action = NO_ACTION;
+	this->target = NULL;
+}
+
+void Interactable::use(){
+	ply->health += 1;
+	hud->fillHearts();
+	
 }

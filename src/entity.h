@@ -37,8 +37,7 @@ struct Entity : Drawable {
 	short int collisionSize;	// Used by anything involved with collisions. Define size for circle collision check 
 	short int damage;			// Projectiles
 	short int health;			// Ships
-	
-	Action action;
+
 	Direction facing;
 	
 	Entity (TextureData &texdata, int x, int y, RenderLayer rl=RL_FOREGROUND);
@@ -52,7 +51,7 @@ struct Entity : Drawable {
 	void DeathClock(int delay);
 	double Distance(Entity *ent2);
 	void use();
-	Entity* closestInteractable(int dist);
+	Interactable* closestInteractable(int dist);
 	void interact();
 	void face(Direction newDirection);
 };
@@ -79,6 +78,20 @@ struct Hud{
 	~Hud();
 	void Draw(double dt);
 	void fillHearts();
+};
+
+struct Door{
+	
+	void open();
+	void close();
+};
+
+struct Interactable : Entity{
+	Action action;
+	Entity *target;
+	
+	Interactable(TextureData &texdata, int x, int y, RenderLayer rl=RL_FOREGROUND);
+	void use();
 };
 
 void initTextures();

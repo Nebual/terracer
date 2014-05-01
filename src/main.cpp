@@ -23,7 +23,6 @@ void initVariables(int w, int h) {
 }
 
 int main(int argc, char *argv[]) {
-	
 	static SDL_Window *window;
 	if(initWindow(&window, &renderer, argc, argv)) return 1;
 	initVariables(WIDTH, HEIGHT);
@@ -39,6 +38,8 @@ int main(int argc, char *argv[]) {
 	
 	PhysicsEntity *goomba = new PhysicsEntity(goombaTD, 500, 50);
 	goomba->patrolling = 1;
+	
+	Interactable *inty = new Interactable(blockTDs["stone"], 500, 700);
 	
 	int lastFrame = curtime_u() - 1;
 	double dt;

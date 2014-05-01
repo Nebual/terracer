@@ -4,6 +4,7 @@
 #include <math.h>
 #include <fstream>
 #include <algorithm>    // std::find
+#include <sstream>
 
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_mixer.h>
@@ -28,10 +29,10 @@ void checkWinLoss(){
 
 void setEntityProperties(Entity* ent, Json::Value info) {
 	if(!!info["collision"]) {ent->collision = info["collision"].asBool();}
-	if(!!info["action"]) {
+	/*if(!!info["action"]) {
 		ent->action = (Action) (std::find(actionLookup, actionLookup + MAX_ACTIONS, info["action"].asString()) - actionLookup);
 		if(ent->action == MAX_ACTIONS) {ent->action = NO_ACTION; printf("Ent properties error: no such action '%s'!\n", info["action"].asCString());}
-	}
+	}*/
 }
 
 Level *curLevel;
@@ -60,6 +61,7 @@ void generateLevel(int level) {
 		return; // TODO: Load from a default?
 	}
 	Json::Value tileset = root["tileset"];
+	Json::Value customEntities = root["entities"];
 	
 	char filename[14] = "";
 	char line[101] = "";
@@ -86,7 +88,12 @@ void generateLevel(int level) {
 				// Note: Anything with RL_BACKGROUND will be compiled into backgroundRLTexture once at startup,
 				// so be sure to set anything that moves to RL_FOREGROUND
 				RenderLayer rl = tileset[blockC].get("static", true).asBool() ? RL_BACKGROUND : RL_FOREGROUND;
-				ent = new Entity(blockTDs[tileset[blockC]["texture"].asString()], x*BLOCK_SIZE, y*BLOCK_SIZE, rl);
+				std::ostringstream sPos; sPos << "(" << x << "," << y << ")";
+				if(!!tileset[blockC]["action"] || (!!customEntities[sPos.str()] && !!customEntities[sPos.str()]["action"])) {
+					ent = new Interactable(blockTDs[tileset[blockC]["texture"].asString()], x*BLOCK_SIZE, y*BLOCK_SIZE, rl);
+				} else {
+					ent = new Entity(blockTDs[tileset[blockC]["texture"].asString()], x*BLOCK_SIZE, y*BLOCK_SIZE, rl);
+				}
 				posLookup[x][y] = ent; // TODO: Remove from list, ensure consistency across block movements
 				setEntityProperties(ent, tileset[blockC]);
 
@@ -103,7 +110,6 @@ void generateLevel(int level) {
 
 	compileBackground(renderer);
 	
-	Json::Value customEntities = root["entities"];
 	char sPos[20];
 	for(Json::ValueIterator iter = customEntities.begin(); iter != customEntities.end(); iter++ ) {
 		strncpy(sPos, iter.memberName(), sizeof(sPos)-1);
