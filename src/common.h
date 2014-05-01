@@ -101,8 +101,6 @@ extern Level *curLevel;
 extern int WIDTH, HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, WIDTH_OFFSET, HEIGHT_OFFSET;
 
 extern std::map <std::string, TextureData> blockTDs;
-extern TextureData goombaTD;
-extern TextureData playerTD;
 
 #ifndef DEBUG
 #define DEBUG 0

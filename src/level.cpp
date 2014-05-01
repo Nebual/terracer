@@ -32,7 +32,7 @@ void setEntityProperties(Entity* ent, Json::Value info) {
 	if(!!info["collision"]) {ent->collision = info["collision"].asBool();}
 	if(!!info["action"]) {
 		if(info["action"].asString() == "PLAYERSPAWN") {
-			ply = new Player(playerTD, ent->pos.x, ent->pos.y - BLOCK_SIZE*3);
+			ply = new Player(getTexture("player"), ent->pos.x, ent->pos.y - BLOCK_SIZE*3);
 			camera.x = ent->pos.x; camera.y = ent->pos.y;
 			delete ent;
 			return;
@@ -58,11 +58,10 @@ Entity* constructEntity(Json::Value tileinfo, int x, int y) {
 	std::string className = tileinfo.get("class","").asString();
 	//std::ostringstream sPos; sPos << "(" << x << "," << y << ")";
 	//if(className == "" && (!!tileset[blockC]["action"] || (!!customEntities[sPos.str()] && !!customEntities[sPos.str()]["action"]))) {className = "interactable";}
-	
 	if(className == "interactable") {
-		ent = new Interactable(blockTDs[tileinfo.get("texture","").asString()], x*BLOCK_SIZE, y*BLOCK_SIZE, rl);
+		ent = new Interactable(getTexture(tileinfo.get("texture","").asString()), x*BLOCK_SIZE, y*BLOCK_SIZE, rl);
 	} else {
-		ent = new Entity(blockTDs[tileinfo.get("texture","").asString()], x*BLOCK_SIZE, y*BLOCK_SIZE, rl);
+		ent = new Entity(getTexture(tileinfo.get("texture","").asString()), x*BLOCK_SIZE, y*BLOCK_SIZE, rl);
 	}
 	return ent;
 }

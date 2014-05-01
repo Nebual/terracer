@@ -20,35 +20,21 @@
 
 
 std::map <std::string, TextureData> blockTDs;
-TextureData explosionTD;
-TextureData playerTD;
-TextureData heart_fullTD;
-TextureData heart_emptyTD;
-TextureData goombaTD;
+TextureData& getTexture(std::string k) {
+	if(blockTDs.count(k) != 0) return blockTDs.at(k);
+	blockTDs[k] = TextureDataCreate(("res/" + k + ".png").c_str());
+	//SDL_SetTextureBlendMode(blockTDs[k].texture, SDL_BLENDMODE_NONE);
+	return blockTDs[k];
+}
 
 void initTextures() {
-	blockTDs["dirt"] = TextureDataCreate("res/dirt.png");
-	blockTDs["stone"] = TextureDataCreate("res/stone.png");
-	blockTDs["sand"] = TextureDataCreate("res/sand.png");
-	blockTDs["sandstone"] = TextureDataCreate("res/sandstone.png");
-	blockTDs["sandstone_bg"] = TextureDataCreate("res/sandstone_bg.png");
-
-	for(auto it=blockTDs.begin(); it != blockTDs.end(); ++it) {
-		SDL_SetTextureBlendMode(it->second.texture, SDL_BLENDMODE_NONE);
-	}
-	
-	goombaTD = TextureDataCreate("res/goomba.png");
-
-	explosionTD.texture = IMG_LoadTexture(renderer, "res/explosion_50.png");
+	TextureData explosionTD = getTexture("explosion_50");
 	explosionTD.animMaxFrames = 36;
 	explosionTD.w = 50; explosionTD.h = 50;
 	explosionTD.animWidth = 8;
 	explosionTD.animDuration = 2;
 	
-	playerTD = TextureDataCreate("res/player_right.png", "res/player_left.png", "res/player_right.png");
-	
-	heart_fullTD = TextureDataCreate("res/heart_full.png");
-	heart_emptyTD = TextureDataCreate("res/heart_empty.png");
+	blockTDs["player"] = TextureDataCreate("res/player_right.png", "res/player_left.png", "res/player_right.png");
 }
 
 TextureData TextureDataCreate(const char texturePath[], const char leftPath[], const char rightPath[]) {
@@ -62,7 +48,7 @@ TextureData TextureDataCreate(const char texturePath[], const char leftPath[], c
 	
 	SDL_SetTextureBlendMode(data.texture, SDL_BLENDMODE_BLEND);
 	SDL_SetTextureBlendMode(data.left, SDL_BLENDMODE_BLEND);
-	SDL_SetTextureBlendMode(data.left, SDL_BLENDMODE_BLEND);
+	SDL_SetTextureBlendMode(data.right, SDL_BLENDMODE_BLEND);
 	SDL_QueryTexture(data.texture, NULL, NULL, &data.w, &data.h);
 	
 	return data;
@@ -171,6 +157,7 @@ void Entity::Damage(int damage) {
 	this->health -= damage;
 	if(this->health <= 0) {
 		//this->type = TYPE_EXPLOSION;
+		TextureData explosionTD = getTexture("explosion_50");
 		this->texture = explosionTD.texture;
 		this->rect.w = explosionTD.w; this->rect.h = explosionTD.h;
 		this->pos.y -= 12;
@@ -442,7 +429,7 @@ void Drawable::Draw(double dt) {
 
 Hud::Hud() {
 	for(int i = 0; i < MAX_HP; i++){
-		hearts[i] = new Drawable(heart_emptyTD, i*50, 0);
+		hearts[i] = new Drawable(getTexture("heart_empty"), i*50, 0);
 	}
 	
 	fillHearts();
@@ -462,9 +449,9 @@ void Hud::fillHearts(){
 		double currentPercent = i/((double) MAX_HP);
 		
 		if(currentPercent < healthPercent){
-			hearts[i]->texture = heart_fullTD.texture;
+			hearts[i]->texture = getTexture("heart_full").texture;
 		}else{
-			hearts[i]->texture = heart_emptyTD.texture;
+			hearts[i]->texture = getTexture("heart_empty").texture;
 		}
 	}	
 }

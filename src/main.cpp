@@ -36,10 +36,10 @@ int main(int argc, char *argv[]) {
 	
 	hud = new Hud();
 	
-	PhysicsEntity *goomba = new PhysicsEntity(goombaTD, 500, 50);
+	PhysicsEntity *goomba = new PhysicsEntity(getTexture("goomba"), 500, 50);
 	goomba->patrolling = 1;
 	
-	Interactable *inty = new Interactable(blockTDs["stone"], 500, 700);
+	Interactable *inty = new Interactable(getTexture("stone"), 500, 700);
 	
 	int lastFrame = curtime_u() - 1;
 	double dt;
