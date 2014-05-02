@@ -40,6 +40,7 @@ struct Entity : Drawable {
 
 	Action action;
 	int iData;
+	std::string sData;
 	Direction facing;
 	
 	Entity (TextureData &texdata, int x, int y, RenderLayer rl=RL_FOREGROUND);

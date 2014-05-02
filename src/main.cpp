@@ -14,9 +14,9 @@
 #include "main.h"
 #include "player.h"
 
-int FIRSTLEVEL = 1;
+std::string FIRSTLEVEL = "1";
 int quit = 0;
-int nextlevel = 0;
+std::string nextlevel;
 
 void initVariables(int w, int h) {
 	camera.w = WIDTH;
@@ -59,10 +59,10 @@ int main(int argc, char *argv[]) {
 
 		// ===================
 		// Update
-		if(nextlevel) {
-			printf("Switching to level %d\n", nextlevel);
+		if(nextlevel != "") {
+			printf("Switching to level %s\n", nextlevel.c_str());
 			generateLevel(nextlevel);
-			nextlevel = 0;
+			nextlevel = "";
 		}
 		TimerRun();
 		for(int enti=0; enti<entsC; enti++) {
@@ -160,7 +160,7 @@ int initWindow(SDL_Window **window, SDL_Renderer **renderer, int argc, char *arg
 	while((c = getopt_long(argc, argv, "l", longOptions, &optionIndex)) != -1) {
 		switch(c) {
 			case 'l':
-				FIRSTLEVEL = atoi(optarg);
+				FIRSTLEVEL = optarg;
 				break;
 		}
 	}

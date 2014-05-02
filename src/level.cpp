@@ -41,10 +41,11 @@ void setEntityProperties(Entity* ent, Json::Value info) {
 		if(ent->action == MAX_ACTIONS) {ent->action = NO_ACTION; printf("Ent properties error: no such action '%s'!\n", info["action"].asCString());}
 	}
 	if(!!info["idata"]) {ent->iData = info["idata"].asInt();}
+	if(!!info["sdata"]) {ent->sData = info["sdata"].asString();}
 }
 
 Level *curLevel;
-Level::Level(int inLevel, Json::Value *root) {
+Level::Level(std::string inLevel, Json::Value *root) {
 	this->w = 0;
 	this->h = 0;
 	this->id = inLevel;
@@ -67,7 +68,7 @@ Entity* constructEntity(Json::Value tileinfo, int x, int y) {
 	return ent;
 }
 
-void generateLevel(int level) {
+void generateLevel(std::string level) {
 	strcpy(menuMode, "");
 	
 	for(int enti=0; enti<entsC; enti++) {
@@ -79,7 +80,7 @@ void generateLevel(int level) {
 	Json::Value root;   // will contains the root value after parsing.
 	curLevel = new Level(level, &root);
 	if(!loadJSONLevel(level, root)) {
-		printf("Error parsing JSON file for level %d!\n", level);
+		printf("Error parsing JSON file for level %s!\n", level.c_str());
 		return; // TODO: Load from a default?
 	}
 	Json::Value tileset = root["tileset"];
@@ -87,7 +88,7 @@ void generateLevel(int level) {
 	
 	char filename[14] = "";
 	char line[101] = "";
-	sprintf(filename, "levels/%d.lvl", level);
+	sprintf(filename, "levels/%s.lvl", level.c_str());
 	if(DEBUG) printf("Reading file %s\n", filename);
 	
 	FILE *fp = fopen(filename, "r");
@@ -139,9 +140,9 @@ void generateLevel(int level) {
 	compileBackground(renderer);
 }
 
-bool loadJSONLevel(int level, Json::Value &root) {
+bool loadJSONLevel(std::string level, Json::Value &root) {
 	char filename[15] = "";
-	sprintf(filename, "levels/%d.json", level);
+	sprintf(filename, "levels/%s.json", level.c_str());
 	if(DEBUG) printf("Reading JSON file %s\n", filename);
 	
 	std::ifstream in(filename);

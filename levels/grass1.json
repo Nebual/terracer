@@ -15,6 +15,6 @@
   },
   "entities": {
     "(1, 23)": {"action":"PLAYERSPAWN"},
-    "(79, 22)": {"action":"SWITCH_LEVEL","idata": 2, "collision": true}
+    "(79, 22)": {"action":"SWITCH_LEVEL","sdata": "3", "collision": true}
   }
 }

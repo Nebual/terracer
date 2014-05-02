@@ -30,7 +30,7 @@ Player::Player(TextureData &texdata, int x, int y) : PhysicsEntity(texdata, x, y
 void Player::HandleCollision(Entity* hit, Direction collideDir, double dt) {
 	if(collideDir & DOWN) this->onGround = 1;
 	if(hit->action == SWITCH_LEVEL) {
-		nextlevel = hit->iData;
+		nextlevel = hit->sData;
 	}
 }
 
