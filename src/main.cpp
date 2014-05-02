@@ -16,7 +16,7 @@
 
 std::string FIRSTLEVEL = "worldmap";
 int quit = 0;
-std::string nextlevel;
+std::string nextlevel = "";
 
 void initVariables(int w, int h) {
 	camera.w = WIDTH;

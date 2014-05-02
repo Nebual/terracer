@@ -15,8 +15,8 @@ extern char menuMode[];
 extern SDL_Texture *backgroundRLTexture;
 
 void checkWinLoss();
-void generateLevel(std::string level);
-bool loadJSONLevel(std::string level, Json::Value &root);
+void generateLevel(std::string &level);
+bool loadJSONLevel(std::string &level, Json::Value &root);
 void drawBackground(SDL_Renderer *renderer, double dt);
 void compileBackground(SDL_Renderer *renderer);
 void drawHud(double dt);

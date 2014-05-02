@@ -68,7 +68,7 @@ Entity* constructEntity(Json::Value tileinfo, int x, int y) {
 	return ent;
 }
 
-void generateLevel(std::string level) {
+void generateLevel(std::string &level) {
 	strcpy(menuMode, "");
 	
 	for(int enti=0; enti<entsC; enti++) {
@@ -86,12 +86,11 @@ void generateLevel(std::string level) {
 	Json::Value tileset = root["tileset"];
 	Json::Value customEntities = root["entities"];
 	
-	char filename[14] = "";
-	char line[101] = "";
-	sprintf(filename, "levels/%s.lvl", level.c_str());
-	if(DEBUG) printf("Reading file %s\n", filename);
+	char line[201] = "";
+	std::string filename = "levels/"+level+".lvl";
+	if(DEBUG) printf("Reading file %s\n", filename.c_str());
 	
-	FILE *fp = fopen(filename, "r");
+	FILE *fp = fopen(filename.c_str(), "r");
 	if(!fp) {
 		//printf("%s not found, you've completed the last level!\n", filename);
 		strcpy(menuMode, "YOU DEFEATED! Play again? Y/N");
@@ -140,12 +139,11 @@ void generateLevel(std::string level) {
 	compileBackground(renderer);
 }
 
-bool loadJSONLevel(std::string level, Json::Value &root) {
-	char filename[15] = "";
-	sprintf(filename, "levels/%s.json", level.c_str());
-	if(DEBUG) printf("Reading JSON file %s\n", filename);
+bool loadJSONLevel(std::string &level, Json::Value &root) {
+	std::string filename = ("levels/" + level + ".json");
+	if(DEBUG) printf("Reading JSON file %s\n", filename.c_str());
 	
-	std::ifstream in(filename);
+	std::ifstream in(filename.c_str());
 	Json::Reader reader;
 	bool parsingSuccessful = reader.parse( in, root );
 	if(!parsingSuccessful) {printf("JSON Parsing Error: %s\n", reader.getFormattedErrorMessages().c_str());}
