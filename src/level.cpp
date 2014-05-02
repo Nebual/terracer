@@ -179,6 +179,11 @@ void handleAction(Entity* ent, Action action){
 			ent->health += 1;
 			hud->fillHearts();
 			break;
+		
+		case OPEN_DOOR:
+			Door *d = (Door*) ent;
+			d->setOpen(); //flip open status
+			break;
 	}
 }
 

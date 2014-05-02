@@ -61,12 +61,14 @@ enum Direction {
 enum Action {
 	NO_ACTION,
 	HEALTH_UP,
+	OPEN_DOOR,
 	SWITCH_LEVEL,
 	MAX_ACTIONS
 };
 static const std::string actionLookup[] = {
 	"NO_ACTION",
 	"HEALTH_UP",
+	"OPEN_DOOR",
 	"SWITCH_LEVEL"
 };
 

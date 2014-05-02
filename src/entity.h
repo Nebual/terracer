@@ -84,10 +84,11 @@ struct Hud{
 	void fillHearts();
 };
 
-struct Door{
+struct Door : Entity{
+	int isOpen;
 	
-	void open();
-	void close();
+	Door(TextureData &texdata, int x, int y, RenderLayer rl=RL_FOREGROUND);
+	void setOpen(int setTo=-1);
 };
 
 struct Interactable : Entity{

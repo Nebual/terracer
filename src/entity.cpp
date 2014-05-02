@@ -497,3 +497,27 @@ void Interactable::use(){
 		Entity::use();
 	}
 }
+
+/* ================= */
+/*  Door		   	 */
+/* ================= */
+
+Door::Door(TextureData &texdata, int x, int y, RenderLayer rl) : Entity(texdata, x, y, rl){
+	this->isOpen = 0;
+}
+
+void Door::setOpen(int setTo){
+	if(setTo == -1){
+		this->isOpen = ! this->isOpen;
+	}else{
+		this->isOpen = setTo;
+	}
+	
+	if(this->isOpen){
+		this->texture = getTexture("stone_door_closed").texture;
+		this->collision = 1;
+	}else{
+		this->texture = getTexture("stone_door_open").texture;
+		this->collision = 0;
+	}
+}

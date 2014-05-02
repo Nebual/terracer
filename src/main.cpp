@@ -39,9 +39,11 @@ int main(int argc, char *argv[]) {
 	PhysicsEntity *goomba = new PhysicsEntity(getTexture("goomba"), 500, 50);
 	goomba->patrolling = 1;
 	
+	Door *door = new Door(getTexture("stone_door_closed"), 900, 480);
+	
 	Interactable *inty = new Interactable(getTexture("stone"), 500, 700);
-	inty->action = HEALTH_UP;
-	inty->target = ply;
+	inty->action = OPEN_DOOR;
+	inty->target = door;
 	
 	int lastFrame = curtime_u() - 1;
 	double dt;
