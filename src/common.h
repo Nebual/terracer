@@ -35,7 +35,7 @@ const int INTERACT_DISPLACEMENT = 20;
 const int MAX_HP = 5;
 
 const int PLAYER_AIR_ACCEL = 900;
-const int PLAYER_MAX_SPEED = 300;
+const int PLAYER_MAX_SPEED = 250;
 const float PLAYER_JUMP_TIME = 0.35;
 const int GRAVITY_ACCEL = 1000;
 const int JUMP_THRESHOLD = 150;

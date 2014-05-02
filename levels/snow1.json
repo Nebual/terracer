@@ -1,0 +1,15 @@
+{
+  "background":"snow_hills",
+  "tileset": {
+    "S": {"texture": "snow"},
+    "1": {"texture": "snow_br"},
+    "2": {"texture": "snow_bl"},
+    "G": {"texture": "snow_side"},
+    "D": {"texture": "dirt"},
+    "E": {"texture": "entity"}
+  },
+  "entities": {
+    "(1, 23)": {"action":"PLAYERSPAWN"},
+    "(79, 22)": {"action":"SWITCH_LEVEL","sdata": "3", "collision": true}
+  }
+}
