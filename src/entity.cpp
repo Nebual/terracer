@@ -386,6 +386,17 @@ void PhysicsEntity::HandleCollision(Entity* hit, Direction collideDir, double dt
 	}
 }
 
+void PhysicsEntity::SetAnimation(Animation newAnim) {
+	switch(newAnim) {
+		case ANIM_NORMAL:
+			this->animMaxFrames = 0;
+			break;
+		case ANIM_WALKING:
+			this->animMaxFrames = 4;
+			break;
+	}
+}
+
 
 inline Direction operator|(Direction a, Direction b) {return static_cast<Direction>(static_cast<int>(a) | static_cast<int>(b));}
 

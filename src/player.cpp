@@ -33,16 +33,7 @@ void Player::HandleCollision(Entity* hit, Direction collideDir, double dt) {
 		nextlevel = hit->iData;
 	}
 }
-void Player::SetAnimation(Animation newAnim) {
-	switch(newAnim) {
-		case ANIM_NORMAL:
-			this->animMaxFrames = 0;
-			break;
-		case ANIM_WALKING:
-			this->animMaxFrames = 4;
-			break;
-	}
-}
+
 void Player::Update(double dt) {
 	this->HandleKeyboard(dt);
 	

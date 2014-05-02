@@ -72,6 +72,7 @@ struct PhysicsEntity : Entity {
 	void moveForward();
 	virtual void Update(double dt);
 	virtual void HandleCollision(Entity* hit, Direction collideDir, double dt);
+	virtual void SetAnimation(Animation newAnim);
 };
 
 struct Hud{
