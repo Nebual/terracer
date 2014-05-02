@@ -30,13 +30,13 @@ TextureData& getTexture(std::string k) {
 
 void initTextures() {
 	TextureData explosionTD = getTexture("explosion_50");
-	explosionTD.animMaxFrames = 36;
+	explosionTD.animMaxFrame = 36;
 	explosionTD.w = 50; explosionTD.h = 50;
 	explosionTD.animWidth = 8;
 	explosionTD.animDuration = 2;
 	
 	blockTDs["player"] = TextureDataCreate("res/player_right.png", "res/player_left.png", "res/player_right.png");
-	blockTDs["player"].animMaxFrames = 4;
+	blockTDs["player"].animMaxFrame = 4;
 	blockTDs["player"].w = 60;
 	blockTDs["player"].h = 80;
 	blockTDs["player"].animWidth = 4;
@@ -44,7 +44,7 @@ void initTextures() {
 }
 
 TextureData TextureDataCreate(const char texturePath[], const char leftPath[], const char rightPath[]) {
-	TextureData data = {NULL, NULL, NULL, 0, 0, 0, 0, 0};
+	TextureData data = {NULL, NULL, NULL, 0, 0, 0, 0, 0, 0};
 	data.texture = IMG_LoadTexture(renderer, texturePath);
 	if (!data.texture) {fprintf(stderr, "Couldn't load %s: %s\n", texturePath, SDL_GetError());}
 	data.left = IMG_LoadTexture(renderer, leftPath);
@@ -168,7 +168,8 @@ void Entity::Damage(int damage) {
 		this->rect.w = explosionTD.w; this->rect.h = explosionTD.h;
 		this->pos.y -= 12;
 		this->animDuration = explosionTD.animDuration;
-		this->animMaxFrames = explosionTD.animMaxFrames;
+		this->animMinFrame = explosionTD.animMinFrame;
+		this->animMaxFrame = explosionTD.animMaxFrame;
 		this->collision = 0;
 		
 		this->DeathClock(explosionTD.animDuration * 1000);
@@ -393,10 +394,10 @@ void PhysicsEntity::HandleCollision(Entity* hit, Direction collideDir, double dt
 void PhysicsEntity::SetAnimation(Animation newAnim) {
 	switch(newAnim) {
 		case ANIM_NORMAL:
-			this->animMaxFrames = 0;
+			this->animMaxFrame = 0;
 			break;
 		case ANIM_WALKING:
-			this->animMaxFrames = 4;
+			this->animMaxFrame = 4;
 			break;
 	}
 }
@@ -414,7 +415,8 @@ Drawable::Drawable(TextureData &texdata, int x, int y) {
 	this->rect = (SDL_Rect) {x,y,texdata.w,texdata.h};
 	this->animTime = 0;
 	this->animDuration = texdata.animDuration;
-	this->animMaxFrames = texdata.animMaxFrames;
+	this->animMinFrame = texdata.animMinFrame;
+	this->animMaxFrame = texdata.animMaxFrame;
 	this->renderLayer = RL_FOREGROUND;
 }
 
@@ -430,9 +432,9 @@ SDL_Rect* Drawable::GetFrame(double dt) {
 		static int curFrame;
 		
 		this->animTime += dt;
-		curFrame = this->animMaxFrames * (this->animTime / this->animDuration);
-		if(curFrame >= this->animMaxFrames) {this->animTime = 0; curFrame = 0;}
-		//printf("Test (%.4f, %.4f, %.4f, %d, %d)\n", ent->animTime, ent->animDuration, ent->animTime / ent->animDuration, ent->animMaxFrames, curFrame);
+		curFrame = this->animMinFrame + this->animMaxFrame * (this->animTime / this->animDuration);
+		if(curFrame >= this->animMaxFrame) {this->animTime = 0; curFrame = 0;}
+		//printf("Test (%.4f, %.4f, %.4f, %d, %d)\n", ent->animTime, ent->animDuration, ent->animTime / ent->animDuration, ent->animMaxFrame, curFrame);
 		srcRect = (SDL_Rect) {this->rect.w * (curFrame % 8), this->rect.h * (curFrame / 8), this->rect.w, this->rect.h};
 		return &srcRect;
 	}

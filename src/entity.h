@@ -7,7 +7,8 @@ struct TextureData {
 	SDL_Texture *texture;
 	SDL_Texture *left;
 	SDL_Texture *right;
-	short int animMaxFrames;
+	short int animMinFrame;
+	short int animMaxFrame;
 	short int animWidth;
 	double animDuration;
 	int w;
@@ -21,7 +22,8 @@ struct Drawable {
 	
 	double animTime;
 	double animDuration;
-	short int animMaxFrames;
+	short int animMinFrame;
+	short int animMaxFrame;
 	RenderLayer renderLayer;
 
 	Drawable(TextureData &texdata, int x, int y);
