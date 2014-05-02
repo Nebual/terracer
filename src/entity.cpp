@@ -229,6 +229,10 @@ void Entity::face(Direction newDirection) {
 	}
 }
 
+void Entity::use(){
+	handleAction(this, this->action);
+}
+
 /* ================= */
 /*  PhysicsEntity 	 */
 /* ================= */
@@ -487,7 +491,9 @@ Interactable::Interactable(TextureData &texdata, int x, int y, RenderLayer rl) :
 }
 
 void Interactable::use(){
-	ply->health += 1;
-	hud->fillHearts();
-	
+	if(this->target != NULL){
+		handleAction(this->target, this->action);
+	}else{
+		Entity::use();
+	}
 }

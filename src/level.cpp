@@ -173,6 +173,15 @@ void drawBackground(SDL_Renderer *renderer, double dt) {
 	SDL_RenderCopy(renderer, backgroundRLTexture, &camera, NULL);
 }
 
+void handleAction(Entity* ent, Action action){
+	switch(action){
+		case HEALTH_UP:
+			ent->health += 1;
+			hud->fillHearts();
+			break;
+	}
+}
+
 
 
 

@@ -20,5 +20,6 @@ void drawBackground(SDL_Renderer *renderer, double dt);
 void compileBackground(SDL_Renderer *renderer);
 void drawHud(double dt);
 void drawHealth();
+void handleAction(Entity* ent, Action action);
 
 #endif

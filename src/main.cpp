@@ -40,6 +40,8 @@ int main(int argc, char *argv[]) {
 	goomba->patrolling = 1;
 	
 	Interactable *inty = new Interactable(getTexture("stone"), 500, 700);
+	inty->action = HEALTH_UP;
+	inty->target = ply;
 	
 	int lastFrame = curtime_u() - 1;
 	double dt;
