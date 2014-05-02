@@ -6,8 +6,9 @@
 struct Level {
 	int w, h;
 	int id;
+	Json::Value *json;
 	Level();
-	Level(int inLevel);
+	Level(int inLevel, Json::Value *json);
 };
 
 extern char menuMode[];

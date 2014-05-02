@@ -44,10 +44,11 @@ void setEntityProperties(Entity* ent, Json::Value info) {
 }
 
 Level *curLevel;
-Level::Level(int inLevel) {
+Level::Level(int inLevel, Json::Value *root) {
 	this->w = 0;
 	this->h = 0;
 	this->id = inLevel;
+	this->json = root;
 }
 
 Entity* constructEntity(Json::Value tileinfo, int x, int y) {
@@ -75,9 +76,8 @@ void generateLevel(int level) {
 	}
 	Entity::GC();
 
-	curLevel = new Level(level);
-
 	Json::Value root;   // will contains the root value after parsing.
+	curLevel = new Level(level, &root);
 	if(!loadJSONLevel(level, root)) {
 		printf("Error parsing JSON file for level %d!\n", level);
 		return; // TODO: Load from a default?
@@ -160,7 +160,12 @@ void compileBackground(SDL_Renderer *renderer) {
 	
 	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
 	SDL_SetRenderDrawColor(renderer, 20,20,20, SDL_ALPHA_OPAQUE);
-	SDL_RenderFillRect(renderer, NULL);
+	
+	//SDL_RenderFillRect(renderer, NULL); // Clear the screen
+	SDL_Texture *bgTex = IMG_LoadTexture(renderer, ("res/backgrounds/" + curLevel->json->get("background","").asString() + ".jpg").c_str());
+	SDL_Rect bgRect = {0,0,curLevel->w,curLevel->h};
+	SDL_RenderCopy(renderer, bgTex, NULL, &bgRect);
+	
 	for(Drawable *ent : renderLayers[RL_BACKGROUND]) {
 		if(ent == NULL) {continue;}
 		ent->Drawable::Draw(0);
