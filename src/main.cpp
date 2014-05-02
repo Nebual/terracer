@@ -14,7 +14,7 @@
 #include "main.h"
 #include "player.h"
 
-std::string FIRSTLEVEL = "1";
+std::string FIRSTLEVEL = "worldmap";
 int quit = 0;
 std::string nextlevel;
 

@@ -1,0 +1,16 @@
+{
+  "background":"bigstars",
+  "tileset": {
+    "W": {"texture": "sandstone"},
+    "S": {"texture": "sand"},
+    "G": {"texture": "grass"},
+    "D": {"texture": "dirt"},
+    "E": {"texture": "entity"}
+  },
+  "entities": {
+    "(1, 23)": {"action":"PLAYERSPAWN"},
+    "(3,19)": {"action":"SWITCH_LEVEL", "sdata": "1", "collision": true},
+    "(7,19)": {"action":"SWITCH_LEVEL", "sdata": "2", "collision": true},
+    "(11,19)": {"action":"SWITCH_LEVEL", "sdata": "grass1", "collision": true}
+  }
+}
