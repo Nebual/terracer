@@ -47,9 +47,9 @@ const int CAM_SPEED = 3;
 /* Structs and Enums */
 /* ================= */
 
-typedef struct {
+struct Vector {
 	double x, y;
-} Vector;
+};
 
 enum Direction {
 	UP = 1,
@@ -85,6 +85,14 @@ enum Animation {
 	ANIM_WALKING,
 	ANIM_JUMPING,
 	ANIM_MAX
+};
+
+enum CollisionType {
+	CT_SQUARE,
+	CT_BL,
+	CT_BR,
+	CT_TL,
+	CT_TR
 };
 
 

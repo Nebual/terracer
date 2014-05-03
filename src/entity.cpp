@@ -44,7 +44,7 @@ void initTextures() {
 }
 
 TextureData TextureDataCreate(const char texturePath[], const char leftPath[], const char rightPath[]) {
-	TextureData data = {NULL, NULL, NULL, 0, 0, 0, 0, 0, 0};
+	TextureData data = {NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, CT_SQUARE};
 	data.texture = IMG_LoadTexture(renderer, texturePath);
 	if (!data.texture) {fprintf(stderr, "Couldn't load %s: %s\n", texturePath, SDL_GetError());}
 	data.left = IMG_LoadTexture(renderer, leftPath);
@@ -56,6 +56,11 @@ TextureData TextureDataCreate(const char texturePath[], const char leftPath[], c
 	SDL_SetTextureBlendMode(data.left, SDL_BLENDMODE_BLEND);
 	SDL_SetTextureBlendMode(data.right, SDL_BLENDMODE_BLEND);
 	SDL_QueryTexture(data.texture, NULL, NULL, &data.w, &data.h);
+	
+	if(strstr(texturePath, "_bl") != 0) data.collisionType = CT_BL;
+	else if(strstr(texturePath, "_br") != 0) data.collisionType = CT_BR;
+	else if(strstr(texturePath, "_tl") != 0) data.collisionType = CT_TL;
+	else if(strstr(texturePath, "_tr") != 0) data.collisionType = CT_TR;
 	
 	return data;
 }
@@ -152,6 +157,22 @@ Entity* Entity::TestCollision() {
 }
 
 int Entity::ContainsPoint(double x, double y) {
+	switch(this->texdata->collisionType) {
+		case CT_SQUARE: break;
+		case CT_TL:
+			if (((x - this->pos.x) + (y - this->pos.y)) > this->rect.w) return false;
+			break;
+		case CT_TR:
+			if ((x - this->pos.x) < (y - this->pos.y)) return false;
+			break;
+		case CT_BL:
+			if ((x - this->pos.x) > (y - this->pos.y)) return false;
+			break;
+		case CT_BR:
+			if (((x - this->pos.x) + (y - this->pos.y)) < this->rect.w) return false;
+			break;
+	}
+	
 	return (x < (this->pos.x + this->rect.w) && 
 		x > this->pos.x &&
 		y < (this->pos.y + this->rect.h) &&

@@ -13,6 +13,7 @@ struct TextureData {
 	double animDuration;
 	int w;
 	int h;
+	CollisionType collisionType;
 };
 
 struct Drawable {
