@@ -1,0 +1,21 @@
+{
+  "background": "dunes",
+  "tileset": {
+    "W": {
+      "texture": "sandstone"
+    },
+    "w": {
+      "texture": "sandstone_bg",
+      "collision": false
+    },
+    "S": {
+      "texture": "sand"
+    },
+    "E": {"texture": "entity"},
+    "F": {"texture": "sandstone_tr"}
+  },
+  "entities": {
+    "(0,33)": {"action":"PLAYERSPAWN"},
+    "(75,46)": {"action":"SWITCH_LEVEL","sdata":"worldmap","collision":true}
+  }
+}

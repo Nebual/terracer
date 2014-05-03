@@ -2,6 +2,7 @@
   "background":"bigstars",
   "tileset": {
     "S": {"texture": "sand"},
+    "T": {"texture": "sandstone"},
     "G": {"texture": "grass"},
     "D": {"texture": "dirt"},
     "E": {"texture": "entity"},
@@ -12,6 +13,7 @@
     "(3,19)": {"action":"SWITCH_LEVEL", "sdata": "1", "collision": true},
     "(7,19)": {"action":"SWITCH_LEVEL", "sdata": "2", "collision": true},
     "(11,19)": {"action":"SWITCH_LEVEL", "sdata": "grass1", "collision": true},
-    "(15,19)": {"action":"SWITCH_LEVEL", "sdata": "snow1", "collision": true}
+    "(15,19)": {"action":"SWITCH_LEVEL", "sdata": "snow1", "collision": true},
+    "(19,19)": {"action":"SWITCH_LEVEL", "sdata": "pyramid1", "collision": true}
   }
 }
