@@ -13,6 +13,7 @@ struct Level {
 
 extern char menuMode[];
 extern SDL_Texture *backgroundRLTexture;
+extern Entity* posLookup[100][100];
 
 void checkWinLoss();
 void generateLevel(std::string &level);

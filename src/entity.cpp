@@ -41,10 +41,18 @@ void initTextures() {
 	blockTDs["player"].h = 80;
 	blockTDs["player"].animWidth = 4;
 	blockTDs["player"].animDuration = 0.75;
+	
+	TextureData *stone_door = &getTexture("stone_door");
+	stone_door->animDuration = -1;
+	stone_door->w = 24;
+	
+	TextureData *lever = &getTexture("lever");
+	lever->animDuration = -1;
+	lever->w = 24;
 }
 
 TextureData TextureDataCreate(const char texturePath[], const char leftPath[], const char rightPath[]) {
-	TextureData data = {NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, CT_SQUARE};
+	TextureData data = {NULL, NULL, NULL, 0, 0, 8, 0, 0, 0, CT_SQUARE};
 	data.texture = IMG_LoadTexture(renderer, texturePath);
 	if (!data.texture) {fprintf(stderr, "Couldn't load %s: %s\n", texturePath, SDL_GetError());}
 	data.left = IMG_LoadTexture(renderer, leftPath);
@@ -204,35 +212,20 @@ double Entity::Distance(Entity *ent2) {
 	return pow(pow(this->pos.x - ent2->pos.x, 2) + powf(this->pos.y - ent2->pos.y, 2), 0.5);
 }
 
-Interactable* Entity::closestInteractable(int minDist) {
+Interactable* Entity::closestInteractable(const Vector &vec) {
 	Interactable *closest = NULL;
-	int dist = minDist;
+	int dist = INTERACT_RANGE;
 	for(int i=0; i<entsC; i++) {
-		if(ents[i] == NULL || this == ents[i]) {continue;}
-		if(dynamic_cast<Interactable*>(ents[i]) == NULL){continue;} //not an interactable object
-				
-		if(this->Distance(ents[i]) < dist) {
-			dist = this->Distance(ents[i]);
-			closest = (Interactable*) ents[i];
+		if(ents[i] == NULL) {continue;}
+		if(Interactable *ent = dynamic_cast<Interactable*>(ents[i])) { //Ensure its an interactable object
+			if(vec.Distance(ent->pos) < dist) {
+				dist = vec.Distance(ent->pos);
+				closest = ent;
+			}
 		}
 	}
 	
 	return closest;
-}
-
-void Entity::interact() {
-	int displacement = INTERACT_RANGE;
-	
-	if(this->facing == RIGHT){
-		displacement = INTERACT_RANGE + INTERACT_DISPLACEMENT;
-	}else if(this->facing == LEFT){
-		displacement = INTERACT_RANGE - INTERACT_DISPLACEMENT;
-	}
-	
-	Interactable *closest = closestInteractable(displacement);
-	if(closest == NULL) {return;}
-	closest->use();
-											
 }
 
 void Entity::face(Direction newDirection) {
@@ -452,11 +445,15 @@ SDL_Rect* Drawable::GetFrame(double dt) {
 		static SDL_Rect srcRect;
 		static int curFrame;
 		
-		this->animTime += dt;
-		curFrame = this->animMinFrame + this->animMaxFrame * (this->animTime / this->animDuration);
-		if(curFrame >= this->animMaxFrame) {this->animTime = 0; curFrame = 0;}
+		if(this->animDuration == -1) {
+			curFrame = this->animMinFrame;
+		} else {
+			this->animTime += dt;
+			curFrame = this->animMinFrame + this->animMaxFrame * (this->animTime / this->animDuration);
+			if(curFrame >= this->animMaxFrame) {this->animTime = 0; curFrame = this->animMinFrame;}
+		}
 		//printf("Test (%.4f, %.4f, %.4f, %d, %d)\n", ent->animTime, ent->animDuration, ent->animTime / ent->animDuration, ent->animMaxFrame, curFrame);
-		srcRect = (SDL_Rect) {this->rect.w * (curFrame % 8), this->rect.h * (curFrame / 8), this->rect.w, this->rect.h};
+		srcRect = (SDL_Rect) {this->rect.w * (curFrame % this->texdata->animWidth), this->rect.h * (curFrame / this->texdata->animWidth), this->rect.w, this->rect.h};
 		return &srcRect;
 	}
 	return NULL;
@@ -519,6 +516,7 @@ void Interactable::use(){
 	}else{
 		Entity::use();
 	}
+	this->animMinFrame = ! this->animMinFrame; // for levers at least
 }
 
 /* ================= */
@@ -526,7 +524,7 @@ void Interactable::use(){
 /* ================= */
 
 Door::Door(TextureData &texdata, int x, int y, RenderLayer rl) : Entity(texdata, x, y, rl){
-	this->isOpen = 0;
+	this->setOpen(0);
 }
 
 void Door::setOpen(int setTo){
@@ -536,11 +534,6 @@ void Door::setOpen(int setTo){
 		this->isOpen = setTo;
 	}
 	
-	if(this->isOpen){
-		this->texture = getTexture("stone_door_closed").texture;
-		this->collision = 1;
-	}else{
-		this->texture = getTexture("stone_door_open").texture;
-		this->collision = 0;
-	}
+	this->animMinFrame = this->isOpen;
+	this->collision = !this->isOpen;
 }

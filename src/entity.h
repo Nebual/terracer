@@ -57,8 +57,7 @@ struct Entity : Drawable {
 	void DeathClock(int delay);
 	double Distance(Entity *ent2);
 	void use();
-	Interactable* closestInteractable(int dist);
-	void interact();
+	Interactable* closestInteractable(const Vector &vec);
 	void face(Direction newDirection);
 };
 

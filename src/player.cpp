@@ -154,3 +154,17 @@ void Player::HandleKeyboard(double dt) {
 	if(camera.y < 0) camera.y = 0;
 	if(camera.y > (curLevel->h - HEIGHT)) camera.y = curLevel->h - HEIGHT;
 }
+
+void Player::interact() {
+	Vector eyePos = this->pos + new Vector(this->rect.w/2, this->rect.h/2);
+	
+	if(this->facing == RIGHT){
+		eyePos.x += this->rect.w;
+	}else if(this->facing == LEFT){
+		eyePos.x -= this->rect.w;
+	}
+	
+	if(Interactable *closest = closestInteractable(eyePos)) {
+		closest->use();
+	}
+}

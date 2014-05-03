@@ -49,6 +49,12 @@ const int CAM_SPEED = 3;
 
 struct Vector {
 	double x, y;
+	
+	Vector() : Vector(0, 0) {};
+	Vector(const double x, const double y);
+	Vector* operator+(const Vector *other);
+	Vector* operator-(const Vector *other);
+	double Distance(const Vector &vec2) const ;
 };
 
 enum Direction {

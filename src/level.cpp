@@ -42,6 +42,15 @@ void setEntityProperties(Entity* ent, Json::Value info) {
 	}
 	if(!!info["idata"]) {ent->iData = info["idata"].asInt();}
 	if(!!info["sdata"]) {ent->sData = info["sdata"].asString();}
+	if(!!info["target"]) {
+		char sPos[20];
+		strncpy(sPos, info["target"].asCString(), sizeof(sPos)-1);
+		if(Entity *target = posLookup[atoi(strtok(sPos+1, ","))][atoi(strtok(NULL, ")"))]) {
+			if(Interactable *interactable = dynamic_cast<Interactable*>(ent)) {
+				interactable->target = target;
+			} else {printf("setEntityProperties Error: Tried to set the target of a non-Interactable.\n");}
+		}
+	}
 }
 
 Level *curLevel;
@@ -60,8 +69,10 @@ Entity* constructEntity(Json::Value tileinfo, int x, int y) {
 	std::string className = tileinfo.get("class","").asString();
 	//std::ostringstream sPos; sPos << "(" << x << "," << y << ")";
 	//if(className == "" && (!!tileset[blockC]["action"] || (!!customEntities[sPos.str()] && !!customEntities[sPos.str()]["action"]))) {className = "interactable";}
-	if(className == "interactable") {
-		ent = new Interactable(getTexture(tileinfo.get("texture","").asString()), x*BLOCK_SIZE, y*BLOCK_SIZE, rl);
+	if(className == "INTERACTABLE") {
+		ent = new Interactable(getTexture(tileinfo.get("texture","").asString()), x*BLOCK_SIZE, y*BLOCK_SIZE, RL_FOREGROUND);
+	} else if(className == "DOOR") {
+		ent = new Door(getTexture(tileinfo.get("texture","").asString()), x*BLOCK_SIZE, y*BLOCK_SIZE, RL_FOREGROUND);
 	} else {
 		ent = new Entity(getTexture(tileinfo.get("texture","").asString()), x*BLOCK_SIZE, y*BLOCK_SIZE, rl);
 	}
@@ -185,8 +196,9 @@ void handleAction(Entity* ent, Action action){
 			break;
 		
 		case OPEN_DOOR:
-			Door *d = (Door*) ent;
-			d->setOpen(); //flip open status
+			if(Door *d = dynamic_cast<Door*>(ent)) {
+				d->setOpen(); //flip open status
+			} else{ printf("handleAction error: Tried to open a non-door!\n"); }
 			break;
 	}
 }

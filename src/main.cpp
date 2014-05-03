@@ -39,12 +39,6 @@ int main(int argc, char *argv[]) {
 	PhysicsEntity *goomba = new PhysicsEntity(getTexture("goomba"), 500, 50);
 	goomba->patrolling = 1;
 	
-	Door *door = new Door(getTexture("stone_door_closed"), 900, 480);
-	
-	Interactable *inty = new Interactable(getTexture("stone"), 500, 700);
-	inty->action = OPEN_DOOR;
-	inty->target = door;
-	
 	int lastFrame = curtime_u() - 1;
 	double dt;
 	while(!quit) {
@@ -54,7 +48,7 @@ int main(int argc, char *argv[]) {
 		int curFrame = curtime_u();
 		if(lastFrame > curFrame) {dt = ((1000000 - lastFrame) + curFrame) / 1000000.0;}
 		else {dt = (curFrame - lastFrame) / 1000000.0;}
-		if(dt > 0.1) {dt = 0.1;} // Clamp dt so objects don't have collision issues
+		if(dt > 0.05) {dt = 0.05;} // Clamp dt so objects don't have collision issues
 		lastFrame = curFrame;
 
 		// ===================

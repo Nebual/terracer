@@ -12,10 +12,13 @@
       "texture": "sand"
     },
     "E": {"texture": "entity"},
-    "F": {"texture": "sandstone_tr"}
+    "F": {"texture": "sandstone_tr"},
+    "O": {"class": "DOOR", "texture": "stone_door"},
+    "I": {"action":"OPEN_DOOR", "texture": "lever", "class":"INTERACTABLE", "collision": false}
   },
   "entities": {
     "(0,33)": {"action":"PLAYERSPAWN"},
-    "(75,46)": {"action":"SWITCH_LEVEL","sdata":"worldmap","collision":true}
+    "(75,46)": {"action":"SWITCH_LEVEL","sdata":"worldmap","collision":true},
+    "(12,33)": {"target":"(15,30)"}
   }
 }

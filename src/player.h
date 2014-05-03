@@ -9,6 +9,7 @@ struct Player : PhysicsEntity {
 	void Update(double dt);
 	void HandleKeyboard(double dt);
 	void HandleCollision(Entity* hit, Direction collideDir, double dt);
+	void interact();
 };
 
 void initInput();
