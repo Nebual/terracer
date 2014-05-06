@@ -85,6 +85,8 @@ Entity::Entity(TextureData &texdata, int x, int y, RenderLayer rl) : Drawable(te
 	this->damage = 0;
 	this->health = 100;
 	this->deathTime = 0;
+	this->iData = 0;
+	this->sData = "";
 	this->action = NO_ACTION;
 	this->facing = RIGHT;
 	

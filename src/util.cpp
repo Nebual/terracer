@@ -126,7 +126,7 @@ void TimerRun() {
 
 void TimerCreate(int id, Uint32 delay, short int reps, void (*callback)()) {
 	//Timer timer = {id, SDL_GetTicks() + delay, delay, reps, callback};
-	Timer *timer = (Timer*) malloc(sizeof(Timer));
+	Timer *timer = new Timer();
 	timer->id = id;
 	timer->endTime = SDL_GetTicks() + delay;
 	timer->delay = delay;
