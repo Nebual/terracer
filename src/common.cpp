@@ -18,11 +18,15 @@ Vector::Vector(const double x, const double y) {
 	this->x = x;
 	this->y = y;
 }
-Vector* Vector::operator+(const Vector *other) {
-	return new Vector(this->x + other->x, this->y + other->y); 
+Vector& Vector::operator+=(const Vector &rhs) {
+	this->x += rhs.x;
+	this->y += rhs.y;
+	return *this;
 }
-Vector* Vector::operator-(const Vector *other) {
-	return new Vector(this->x - other->x, this->y - other->y); 
+Vector& Vector::operator-=(const Vector &rhs) {
+	this->x -= rhs.x;
+	this->y -= rhs.y;
+	return *this;
 }
 
 double Vector::Distance(const Vector &other) const {

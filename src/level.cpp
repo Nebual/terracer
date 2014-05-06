@@ -89,6 +89,7 @@ void generateLevel(std::string &level) {
 	Entity::GC();
 
 	Json::Value root;   // will contains the root value after parsing.
+	delete curLevel;
 	curLevel = new Level(level, &root);
 	if(!loadJSONLevel(level, root)) {
 		printf("Error parsing JSON file for level %s!\n", level.c_str());

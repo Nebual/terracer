@@ -52,10 +52,12 @@ struct Vector {
 	
 	Vector() : Vector(0, 0) {};
 	Vector(const double x, const double y);
-	Vector* operator+(const Vector *other);
-	Vector* operator-(const Vector *other);
+	Vector& operator+=(const Vector &rhs);
+	Vector& operator-=(const Vector &rhs);
 	double Distance(const Vector &vec2) const ;
 };
+inline Vector operator+(Vector lhs, const Vector &rhs) {return lhs += rhs;} // lhs is intentionally a copy
+inline Vector operator-(Vector lhs, const Vector &rhs) {return lhs -= rhs;}
 
 enum Direction {
 	UP = 1,

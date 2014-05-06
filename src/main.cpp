@@ -97,6 +97,7 @@ int main(int argc, char *argv[]) {
 		if(ents[enti] == NULL) continue;
 		delete ents[enti];
 	}
+	delete curLevel;
 
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);

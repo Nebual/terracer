@@ -156,8 +156,8 @@ void Player::HandleKeyboard(double dt) {
 }
 
 void Player::interact() {
-	Vector eyePos = this->pos + new Vector(this->rect.w/2, this->rect.h/2);
-	
+	Vector eyePos = this->pos + Vector(this->rect.w/2, this->rect.h/2);
+
 	if(this->facing == RIGHT){
 		eyePos.x += this->rect.w;
 	}else if(this->facing == LEFT){
