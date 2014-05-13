@@ -144,6 +144,9 @@ void cleanLevel() {
 		if(ents[enti] == NULL) continue;
 		delete ents[enti];
 	}
+	for(auto &worldtip : worldtips) {
+		delete worldtip;
+	}
 	worldtips.clear();
 	Entity::GC();
 	

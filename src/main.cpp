@@ -97,6 +97,7 @@ int main(int argc, char *argv[]) {
 	for(std::map<std::string, TextureData>::iterator it = blockTDs.begin(); it != blockTDs.end(); ++it) {
 		SDL_DestroyTexture(it->second.texture);
 	}
+	blockTDs.clear();
 
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
