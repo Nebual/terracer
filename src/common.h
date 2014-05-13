@@ -65,6 +65,12 @@ enum Direction {
 	LEFT = 4,
 	RIGHT = 8
 };
+static const std::string directionLookup[] = {
+	"UP",
+	"DOWN",
+	"LEFT",
+	"RIGHT"
+};
 
 enum Action {
 	NO_ACTION,

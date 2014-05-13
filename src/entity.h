@@ -27,7 +27,8 @@ struct Drawable {
 	short int animMaxFrame;
 	RenderLayer renderLayer;
 
-	Drawable(TextureData &texdata, int x, int y);
+	Drawable(RenderLayer rl=RL_FOREGROUND);
+	Drawable(TextureData &texdata, int x, int y, RenderLayer rl=RL_FOREGROUND);
 	~Drawable();
 	virtual SDL_Rect* GetFrame(double dt);
 	virtual void Draw(double dt);
@@ -46,7 +47,7 @@ struct Entity : Drawable {
 	std::string sData;
 	Direction facing;
 	
-	Entity (TextureData &texdata, int x, int y, RenderLayer rl=RL_FOREGROUND);
+	Entity (TextureData &texdata, int x, int y, RenderLayer rl);
 	~Entity ();
 	void Draw(double dt);
 	virtual void Update(double dt);
@@ -100,6 +101,8 @@ struct Interactable : Entity{
 	Interactable(TextureData &texdata, int x, int y, RenderLayer rl=RL_FOREGROUND);
 	void use();
 };
+
+extern std::map <std::string, TextureData> blockTDs;
 
 void initTextures();
 TextureData& getTexture(std::string k);

@@ -19,7 +19,7 @@ void initInput() {
 	}
 }
 
-Player::Player(TextureData &texdata, int x, int y) : PhysicsEntity(texdata, x, y, RL_FOREGROUND2) {
+Player::Player(TextureData &texdata, int x, int y) : PhysicsEntity(texdata, x, y, RL_HUD) {
 	this->collision = 1;
 	this->health = 1;
 	for(int i=0; i<9; i++) {

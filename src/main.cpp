@@ -70,9 +70,9 @@ int main(int argc, char *argv[]) {
 		
 		// ====================
 		// Drawing
-		drawBackground(renderer, dt);
 		for(int rli=0; rli<RL_MAX; rli++){
 			if(rli == RL_BACKGROUND) {
+				drawBackground(renderer, dt);
 				continue; // Done in drawBackground
 			}
 			Drawable** layer = renderLayers[rli];
@@ -92,12 +92,11 @@ int main(int argc, char *argv[]) {
 	}
 	printf("\nShutting down...\n");
 
+	cleanLevel();
 	// Destroy old textures
-	for(int enti=0; enti<entsC; enti++) {
-		if(ents[enti] == NULL) continue;
-		delete ents[enti];
+	for(std::map<std::string, TextureData>::iterator it = blockTDs.begin(); it != blockTDs.end(); ++it) {
+		SDL_DestroyTexture(it->second.texture);
 	}
-	delete curLevel;
 
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);

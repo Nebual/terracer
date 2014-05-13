@@ -78,7 +78,7 @@ TextureData TextureDataCreate(const char texturePath[], const char leftPath[], c
 /* ================= */
 
 
-Entity::Entity(TextureData &texdata, int x, int y, RenderLayer rl) : Drawable(texdata, x, y) {
+Entity::Entity(TextureData &texdata, int x, int y, RenderLayer rl) : Drawable(texdata, x, y, rl) {
 	this->pos = (Vector) {(double) x,(double) y};
 	this->collision = 1;
 	this->collisionSize = (this->rect.w + this->rect.h) / 2; // Average of widthheight / 2
@@ -90,10 +90,7 @@ Entity::Entity(TextureData &texdata, int x, int y, RenderLayer rl) : Drawable(te
 	this->action = NO_ACTION;
 	this->facing = RIGHT;
 	
-	this->renderLayer = rl;
-	
 	ents[entsC++] = this;
-	renderLayers[this->renderLayer][renderLayersC[this->renderLayer]++] = this;
 }
 
 Entity::~Entity() {
@@ -425,7 +422,21 @@ inline Direction operator|(Direction a, Direction b) {return static_cast<Directi
 /*  Drawable	  	 */
 /* ================= */
 
-Drawable::Drawable(TextureData &texdata, int x, int y) {
+Drawable::Drawable(RenderLayer rl) {
+	TextureData texdata = {NULL, NULL, NULL, 0, 0, 8, 0, 0, 0, CT_SQUARE};
+	this->texture = texdata.texture;
+	this->texdata = &texdata;
+	this->rect = (SDL_Rect) {0,0,texdata.w,texdata.h};
+	this->animTime = 0;
+	this->animDuration = texdata.animDuration;
+	this->animMinFrame = texdata.animMinFrame;
+	this->animMaxFrame = texdata.animMaxFrame;
+	
+	this->renderLayer = rl;
+	renderLayers[this->renderLayer][renderLayersC[this->renderLayer]++] = this;
+}
+
+Drawable::Drawable(TextureData &texdata, int x, int y, RenderLayer rl) {
 	this->texture = texdata.texture;
 	this->texdata = &texdata;
 	this->rect = (SDL_Rect) {x,y,texdata.w,texdata.h};
@@ -433,7 +444,9 @@ Drawable::Drawable(TextureData &texdata, int x, int y) {
 	this->animDuration = texdata.animDuration;
 	this->animMinFrame = texdata.animMinFrame;
 	this->animMaxFrame = texdata.animMaxFrame;
-	this->renderLayer = RL_FOREGROUND;
+	
+	this->renderLayer = rl;
+	renderLayers[this->renderLayer][renderLayersC[this->renderLayer]++] = this;
 }
 
 Drawable::~Drawable() {
@@ -471,7 +484,7 @@ void Drawable::Draw(double dt) {
 
 Hud::Hud() {
 	for(int i = 0; i < MAX_HP; i++){
-		hearts[i] = new Drawable(getTexture("heart_empty"), i*50, 0);
+		hearts[i] = new Drawable(getTexture("heart_empty"), i*50, 0, RL_HUD);
 	}
 	
 	fillHearts();
@@ -499,9 +512,7 @@ void Hud::fillHearts(){
 }
 
 void Hud::Draw(double dt){
-	for(int i = 0; i < MAX_HP; i++) {
-		this->hearts[i]->Draw(dt);
-	}
+	
 }
 
 /* ================= */

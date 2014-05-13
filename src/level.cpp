@@ -24,6 +24,8 @@ char menuMode[50];
 Entity* posLookup[100][100];
 SDL_Texture *backgroundRLTexture;
 
+std::vector<WorldTip*> worldtips; 
+
 void checkWinLoss(){
 	if(menuMode[0] != '\0'){return;}
 }
@@ -50,6 +52,63 @@ void setEntityProperties(Entity* ent, Json::Value info) {
 				interactable->target = target;
 			} else {printf("setEntityProperties Error: Tried to set the target of a non-Interactable.\n");}
 		}
+	}
+	if(!!info["msg"]) {
+		Direction dir = DOWN;
+		if(!!info["msgdir"]) { dir = (Direction) (1 << std::find(directionLookup, directionLookup + 4, info["msgdir"].asString()) - directionLookup); }
+
+		worldtips.push_back(new WorldTip(ent, info["msg"].asCString(), dir));
+	}
+}
+
+WorldTip::WorldTip(const Entity *ent, const char *text, Direction dir) : Drawable(RL_FOREGROUND2)  {
+	SDL_Texture *txt_tex = readyText(text, BLACK);
+	SDL_Rect rect = {0, 0, 0, 0};
+	SDL_QueryTexture(txt_tex, NULL, NULL, &rect.w, &rect.h);
+	
+	SDL_Texture *tex = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET, rect.w + 10, rect.h + 10);
+	SDL_SetRenderTarget(renderer, tex);
+	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+	SDL_Rect draw_rect = {2, 2, rect.w + 6, rect.h + 6};
+	SDL_RenderFillRect(renderer, &draw_rect);
+	draw_rect = {5, 5, rect.w, rect.h};
+	SDL_RenderCopy(renderer, txt_tex, NULL, &draw_rect);
+	SDL_SetRenderTarget(renderer, NULL);
+	SDL_DestroyTexture(txt_tex);
+
+	rect.w += 10; rect.h += 10; // Grow the rect, to encompass the border
+	rect.x = (int) ent->pos.x + ent->rect.w / 2; rect.y = (int) ent->pos.y + ent->rect.h / 2;
+	switch(dir) {
+		case UP:
+			rect.x -= rect.w / 2;
+			rect.y -= rect.h + 50;
+			break;
+		case DOWN:
+			rect.x -= rect.w / 2;
+			rect.y += 50;
+			break;
+		case LEFT:
+			rect.x -= rect.w + 50;
+			rect.y -= rect.h / 2;
+			break;
+		case RIGHT:
+			rect.x += rect.w + 50;
+			rect.y -= rect.h / 2;
+			break;
+	}
+
+	this->rect = rect;
+	this->texdata->texture = tex;
+	this->texture = tex;
+	this->origin = Vector(ent->pos.x, ent->pos.y);
+}
+WorldTip::~WorldTip() {
+	SDL_DestroyTexture(this->texture);
+}
+void WorldTip::Draw(double dt) {
+	if(ply->pos.Distance(this->origin) < 200) {
+		SDL_Rect rect = {this->rect.x - camera.x, this->rect.y - camera.y, this->rect.w, this->rect.h};
+		if(SDL_RenderCopy(renderer, this->texture, NULL, &rect) != 0) {printf("Worldtip Render failed: %s\n", SDL_GetError());}
 	}
 }
 
@@ -79,17 +138,24 @@ Entity* constructEntity(Json::Value tileinfo, int x, int y) {
 	return ent;
 }
 
-void generateLevel(std::string &level) {
-	strcpy(menuMode, "");
-	
+// Run when switching to a new level or on shutdown
+void cleanLevel() {
 	for(int enti=0; enti<entsC; enti++) {
 		if(ents[enti] == NULL) continue;
 		delete ents[enti];
 	}
+	worldtips.clear();
 	Entity::GC();
+	
+	delete curLevel;
+}
+
+void generateLevel(std::string &level) {
+	strcpy(menuMode, "");
+	
+	cleanLevel();
 
 	Json::Value root;   // will contains the root value after parsing.
-	delete curLevel;
 	curLevel = new Level(level, &root);
 	if(!loadJSONLevel(level, root)) {
 		printf("Error parsing JSON file for level %s!\n", level.c_str());
