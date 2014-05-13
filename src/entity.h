@@ -81,11 +81,13 @@ struct PhysicsEntity : Entity {
 
 struct Hud{
 	Drawable *hearts[5];
+	Drawable *scrap;
 	
 	Hud();
 	~Hud();
-	void Draw(double dt);
+	void update();
 	void fillHearts();
+	void setScrapText();
 };
 
 struct Door : Entity{

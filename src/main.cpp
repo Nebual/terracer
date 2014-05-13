@@ -82,8 +82,6 @@ int main(int argc, char *argv[]) {
 			}
 		}
 		
-		hud->Draw(dt);
-		
 		// Flip render buffer
 		SDL_RenderPresent(renderer);
 		

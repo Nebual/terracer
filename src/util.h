@@ -20,6 +20,7 @@ void fpsCounter();
 void playSound(Mix_Chunk *snd);
 int random_range(int min, int max);
 void displayText(int x, int y, const char text[], SDL_Color color=WHITE);
+TextureData readyTextAsTD(const char text[], SDL_Color color);
 SDL_Texture* readyText(const char text[], SDL_Color color);
 void displayTextCentered(int x, int y, const char text[], SDL_Color color=WHITE);
 

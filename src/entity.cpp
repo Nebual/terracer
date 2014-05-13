@@ -486,13 +486,29 @@ Hud::Hud() {
 		hearts[i] = new Drawable(getTexture("heart_empty"), i*50, 0, RL_HUD);
 	}
 	
-	fillHearts();
+	update();
 }
 
 Hud::~Hud(){
 	for(int i = 0; i < MAX_HP; i++){
 		delete this->hearts[i];
 	}
+	delete this->scrap;
+}
+
+void Hud::update(){
+	setScrapText();
+	fillHearts();
+}
+
+void Hud::setScrapText(){
+	char scrapText[100];
+	int scrapCount = ply->scrapCount;
+	sprintf(scrapText, "%d", scrapCount);
+	
+	TextureData data = readyTextAsTD(scrapText, WHITE);
+
+	this->scrap = new Drawable(data, WIDTH-50, 0, RL_HUD);
 }
 
 void Hud::fillHearts(){
@@ -508,10 +524,6 @@ void Hud::fillHearts(){
 			hearts[i]->texture = getTexture("heart_empty").texture;
 		}
 	}	
-}
-
-void Hud::Draw(double dt){
-	
 }
 
 /* ================= */

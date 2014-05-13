@@ -22,6 +22,7 @@ void initInput() {
 Player::Player(TextureData &texdata, int x, int y) : PhysicsEntity(texdata, x, y, RL_HUD) {
 	this->collision = 1;
 	this->health = 1;
+	this->scrapCount = 0;
 	for(int i=0; i<9; i++) {
 		this->collisionPoints[i].x = genericCollisionPoints[i].x * 42 + 10;
 		this->collisionPoints[i].y = genericCollisionPoints[i].y * this->rect.h;

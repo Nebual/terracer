@@ -6,6 +6,7 @@
 #include <SDL2/SDL_mixer.h>
 #include <SDL2/SDL_ttf.h>
 
+#include "entity.h"
 #include "util.h"
 
 TTF_Font *prototype;
@@ -93,6 +94,16 @@ SDL_Texture* readyText(const char text[], SDL_Color color){
 		
 		return texture;
 	}	
+}
+
+TextureData readyTextAsTD(const char text[], SDL_Color color){
+	SDL_Texture* tex = readyText(text, color);
+	TextureData data = {NULL, NULL, NULL, 0, 0, 8, 0, 0, 0, CT_SQUARE};
+	data.texture = tex;
+	SDL_SetTextureBlendMode(data.texture, SDL_BLENDMODE_BLEND);
+	SDL_QueryTexture(data.texture, NULL, NULL, &data.w, &data.h);
+	
+	return data;	
 }
 
 void displayTextCentered(int x, int y, const char text[], SDL_Color color){

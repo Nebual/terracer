@@ -260,7 +260,7 @@ void handleAction(Entity* ent, Action action){
 	switch(action){
 		case HEALTH_UP:
 			ent->health += 1;
-			hud->fillHearts();
+			hud->update();
 			break;
 		
 		case OPEN_DOOR:
