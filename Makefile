@@ -1,19 +1,23 @@
 EXECUTABLE=terracer
 EXTRALIBS=-lSDL2_image -lm -lSDL2_ttf -lSDL2_mixer
+#Uncomment the following line to suppress the gcc commandline
+QUIET=@
+#Suggested Optimization Levels: -O0 (fastest), -Og (good middleground), -O2 (slowest compile)
+OPTIMIZATION=-O0
 
 #SOURCES=src/main.c $(wildcard src/*.c)
 SOURCES=entity.cpp player.cpp main.cpp level.cpp util.cpp common.cpp
 EXTERNALSOURCES=jsoncpp.cpp
 
-CC=g++
+CC=ccache g++
 C99MODE=-std=c++0x
-EXTRACFLAGS=-g $(C99MODE) -Wuninitialized -Wmissing-field-initializers -O2
+EXTRACFLAGS=-g $(C99MODE) -Wuninitialized -Wmissing-field-initializers $(OPTIMIZATION)
 
 debug: EXTRACFLAGS +=-DDEBUG -g
 warn: EXTRACFLAGS += -Wall -Wextra
 
 # Targetting Windows x64
-win32: CC:=x86_64-w64-mingw32-$(CC)
+win32: CC:=x86_64-w64-mingw32-g++
 win32: EXECUTABLE:=$(EXECUTABLE).exe
 win32: CFLAGS=-I$(WINFOLDER)include/SDL2 -Dmain=SDL_main $(EXTRACFLAGS) -Iexternals/include
 win32: LIBS=-L$(WINFOLDER)lib -lmingw32 -lSDL2main -lSDL2 $(EXTRALIBS)
@@ -36,7 +40,7 @@ WINFOLDER:=/usr/x86_64-w64-mingw32/
 CFLAGS=$(shell sdl2-config --cflags) $(EXTRACFLAGS) -Iexternals/include -march=native
 LIBS=$(shell sdl2-config --libs) $(EXTRALIBS)
 
-all: compile
+all: clean compile
 win32: all
 	zip $(EXECUTABLE).zip $(EXECUTABLE)
 	upload $(EXECUTABLE).zip
@@ -60,21 +64,23 @@ endif
 
 
 $(OBJECTS): build/%.o : src/%.cpp
-	$(CC) $(CFLAGS) -o $@ -c $<
+	@echo Compiling $<...
+	$(QUIET)$(CC) $(CFLAGS) -o $@ -c $<
 $(EXTERNALOBJECTS): externals/build/%.o : externals/src/%.cpp
 	$(CC) -Iexternals/include -o $@ -c $<
 clean:
-	-rm build/*.o
+	-rm -f build/*.o
 clean2: #A second one so we can execute clean twice
-	-rm build/*.o
+	-rm -f build/*.o
 cleanall:
-	-rm build/*.o
-	-rm externals/build/*.o
+	-rm -f build/*.o
+	-rm -f externals/build/*.o
+
 
 compile: $(OBJECTS) $(EXTERNALOBJECTS)
 	@echo
-	@echo Linking...
-	$(CC) $(CFLAGS) -o $(EXECUTABLE) $(OBJECTS) $(EXTERNALOBJECTS) $(LIBS)
+	@echo Linking $(EXECUTABLE)...
+	$(QUIET)$(CC) $(CFLAGS) -o $(EXECUTABLE) $(OBJECTS) $(EXTERNALOBJECTS) $(LIBS)
 
 
 zip: win32

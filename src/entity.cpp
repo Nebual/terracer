@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <sys/time.h>
 #include <math.h>
-#include <typeinfo>
 #ifdef _WIN32
 	#include <windows.h>
 #endif
