@@ -11,6 +11,7 @@
 TTF_Font *prototype;
 
 SDL_Color WHITE;
+SDL_Color BLACK = {0,0,0,255};
 
 void initFonts(){
 	prototype = TTF_OpenFont("res/fonts/Prototype.ttf", 24);
@@ -70,7 +71,7 @@ void playSound(Mix_Chunk *snd) {
 }
 
 void displayText(int x, int y, const char text[], SDL_Color color){
-	if(SDL_Texture* texture = readyText(x, y, text, color)){
+	if(SDL_Texture* texture = readyText(text, color)){
 		SDL_Rect rect = {x, y, 0, 0};
 		SDL_QueryTexture(texture, NULL, NULL, &rect.w, &rect.h);
 		
@@ -81,7 +82,7 @@ void displayText(int x, int y, const char text[], SDL_Color color){
 
 }
 
-SDL_Texture* readyText(int x, int y, const char text[], SDL_Color color){
+SDL_Texture* readyText(const char text[], SDL_Color color){
 	SDL_Surface *text_surface;
 	if(!(text_surface=TTF_RenderText_Solid(prototype, text, color))) {
 		printf("TTF_Init: %s\n", TTF_GetError());
@@ -95,7 +96,7 @@ SDL_Texture* readyText(int x, int y, const char text[], SDL_Color color){
 }
 
 void displayTextCentered(int x, int y, const char text[], SDL_Color color){
-	if(SDL_Texture* texture = readyText(x, y, text, color)){
+	if(SDL_Texture* texture = readyText(text, color)){
 		SDL_Rect rect = {x, y, 0, 0};
 		SDL_QueryTexture(texture, NULL, NULL, &rect.w, &rect.h);
 		
