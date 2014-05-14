@@ -78,13 +78,16 @@ enum Action {
 	OPEN_DOOR,
 	SWITCH_LEVEL,
 	SCRAP_UP,
+	CRUMBLES,
 	MAX_ACTIONS
 };
 static const std::string actionLookup[] = {
 	"NO_ACTION",
 	"HEALTH_UP",
 	"OPEN_DOOR",
-	"SWITCH_LEVEL"
+	"SWITCH_LEVEL",
+	"SCRAP_UP",
+	"CRUMBLES"
 };
 
 enum RenderLayer{

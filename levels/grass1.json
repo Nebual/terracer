@@ -10,6 +10,7 @@
     },
     "S": {"texture": "sand"},
     "G": {"texture": "grass"},
+    "C": {"texture": "grass", "static": false, "action": "CRUMBLES"},
     "D": {"texture": "dirt"},
     "E": {"texture": "entity"}
   },

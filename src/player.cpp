@@ -33,6 +33,14 @@ void Player::HandleCollision(Entity* hit, Direction collideDir, double dt) {
 	if(hit->action == SWITCH_LEVEL) {
 		nextlevel = hit->sData;
 	}
+	if(hit->action == CRUMBLES && hit->health != 0) {
+		hit->health = 0;
+		hit->collision = 0;
+		hit->DeathClock(1000);
+		TimerCreate(hit->id, 50, 20, [=](){
+			hit->pos.y += 2;
+		});
+	}
 }
 
 void Player::Update(double dt) {
