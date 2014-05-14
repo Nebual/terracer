@@ -17,6 +17,7 @@ struct TextureData {
 };
 
 struct Drawable {
+	int id;
 	SDL_Rect rect;
 	SDL_Texture *texture;
 	TextureData *texdata;

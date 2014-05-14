@@ -439,7 +439,10 @@ Drawable::Drawable(RenderLayer rl) {
 	renderLayers[this->renderLayer][renderLayersC[this->renderLayer]++] = this;
 }
 
+int NEXT_ENTID = 0;
+
 Drawable::Drawable(TextureData &texdata, int x, int y, RenderLayer rl) {
+	this->id = NEXT_ENTID++;
 	this->texture = texdata.texture;
 	this->texdata = &texdata;
 	this->rect = (SDL_Rect) {x,y,texdata.w,texdata.h};
