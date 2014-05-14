@@ -2,6 +2,7 @@
 #define __UTIL_H
 
 #include "common.h"
+#include <functional>
 
 extern SDL_Color WHITE;
 extern SDL_Color BLACK;
@@ -29,7 +30,7 @@ struct Timer {
 	Uint32 endTime;
 	Uint32 delay;
 	short int reps;
-	void (*callback)();
+	std::function<void ()> callback;
 };
 
 void TimerRun();
@@ -40,7 +41,7 @@ void TimerRun();
  * @param callback The function to run once the timer is up
  * @example TimerCreate(5, 2000, 1, [](){ply->pos.y = 500;});
  */
-void TimerCreate(int id, Uint32 delay, short int reps, void (*callback)());
+void TimerCreate(int id, Uint32 delay, short int reps, const std::function<void ()> &callback);
 void TimerDestroy(int id);
 
 #endif

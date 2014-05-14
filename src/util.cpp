@@ -136,7 +136,7 @@ void TimerRun() {
 	}
 }
 
-void TimerCreate(int id, Uint32 delay, short int reps, void (*callback)()) {
+void TimerCreate(int id, Uint32 delay, short int reps, const std::function<void ()> &callback) {
 	//Timer timer = {id, SDL_GetTicks() + delay, delay, reps, callback};
 	Timer *timer = new Timer();
 	timer->id = id;
