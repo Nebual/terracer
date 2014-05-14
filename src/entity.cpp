@@ -490,6 +490,8 @@ Hud::Hud() {
 		hearts[i] = new Drawable(getTexture("heart_empty"), i*50, 0, RL_HUD);
 	}
 	
+	this->scrap = NULL;
+	
 	update();
 }
 
@@ -497,6 +499,7 @@ Hud::~Hud(){
 	for(int i = 0; i < MAX_HP; i++){
 		delete this->hearts[i];
 	}
+	
 	delete this->scrap;
 }
 
@@ -511,7 +514,12 @@ void Hud::setScrapText(){
 	sprintf(scrapText, "%d", scrapCount);
 	
 	TextureData data = readyTextAsTD(scrapText, WHITE);
-
+	
+	if(this->scrap != NULL){
+		SDL_DestroyTexture(this->scrap->texture);
+		delete this->scrap;
+	}
+	
 	this->scrap = new Drawable(data, WIDTH-50, 0, RL_HUD);
 }
 

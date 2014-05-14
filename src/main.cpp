@@ -40,12 +40,16 @@ int main(int argc, char *argv[]) {
 	/*  Test Stuff  */
 	/*==============*/
 	
-	PhysicsEntity *goomba = new PhysicsEntity(getTexture("goomba"), 500, 50);
+	/*PhysicsEntity *goomba = new PhysicsEntity(getTexture("goomba"), 500, 50);
 	goomba->patrolling = 1;
 	
-	Interactable *inty = new Interactable(getTexture("concrete"), 800, 500);
-	inty->target = ply;
-	inty->action = HEALTH_UP;
+	Interactable *healthUp = new Interactable(getTexture("concrete"), 800, 500);
+	healthUp->target = ply;
+	healthUp->action = HEALTH_UP;
+	
+	Interactable *scrapUp = new Interactable(getTexture("sand"), 850, 500);
+	scrapUp->target = ply;
+	scrapUp->action = SCRAP_UP;*/
 	
 	/*=================*/
 	/*End of Test Stuff*/

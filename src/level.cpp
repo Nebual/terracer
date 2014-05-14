@@ -267,6 +267,10 @@ void handleAction(Entity* ent, Action action){
 				d->setOpen(); //flip open status
 			} else{ printf("handleAction error: Tried to open a non-door!\n"); }
 			break;
+			
+		case SCRAP_UP:
+			ply->setScrap(ply->scrapCount + 1);
+			break;
 	}
 }
 

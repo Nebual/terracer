@@ -174,3 +174,8 @@ void Player::setHealth(int newValue){
 	this->health = newValue;
 	hud->update();
 }
+
+void Player::setScrap(int newValue){
+	this->scrapCount = newValue;
+	hud->update();
+}

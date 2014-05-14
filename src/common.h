@@ -77,6 +77,7 @@ enum Action {
 	HEALTH_UP,
 	OPEN_DOOR,
 	SWITCH_LEVEL,
+	SCRAP_UP,
 	MAX_ACTIONS
 };
 static const std::string actionLookup[] = {
