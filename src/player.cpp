@@ -169,3 +169,8 @@ void Player::interact() {
 		closest->use();
 	}
 }
+
+void Player::setHealth(int newValue){
+	this->health = newValue;
+	hud->update();
+}

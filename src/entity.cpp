@@ -246,6 +246,10 @@ void Entity::use(){
 	handleAction(this, this->action);
 }
 
+void Entity::setHealth(int newValue){
+	this->health = newValue;
+}
+
 /* ================= */
 /*  PhysicsEntity 	 */
 /* ================= */

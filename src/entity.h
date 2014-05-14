@@ -60,6 +60,7 @@ struct Entity : Drawable {
 	void use();
 	Interactable* closestInteractable(const Vector &vec);
 	void face(Direction newDirection);
+	virtual void setHealth(int newValue);
 };
 
 struct PhysicsEntity : Entity {

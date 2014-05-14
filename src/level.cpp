@@ -259,8 +259,7 @@ void drawBackground(SDL_Renderer *renderer, double dt) {
 void handleAction(Entity* ent, Action action){
 	switch(action){
 		case HEALTH_UP:
-			ent->health += 1;
-			hud->update();
+			ent->setHealth(ent->health + 1);
 			break;
 		
 		case OPEN_DOOR:

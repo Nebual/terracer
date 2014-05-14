@@ -11,6 +11,7 @@ struct Player : PhysicsEntity {
 	void HandleKeyboard(double dt);
 	void HandleCollision(Entity* hit, Direction collideDir, double dt);
 	void interact();
+	void setHealth(int newValue);
 };
 
 void initInput();

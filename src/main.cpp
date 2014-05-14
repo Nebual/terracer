@@ -36,8 +36,20 @@ int main(int argc, char *argv[]) {
 	
 	hud = new Hud();
 	
+	/*==============*/
+	/*  Test Stuff  */
+	/*==============*/
+	
 	PhysicsEntity *goomba = new PhysicsEntity(getTexture("goomba"), 500, 50);
 	goomba->patrolling = 1;
+	
+	Interactable *inty = new Interactable(getTexture("concrete"), 800, 500);
+	inty->target = ply;
+	inty->action = HEALTH_UP;
+	
+	/*=================*/
+	/*End of Test Stuff*/
+	/*=================*/		
 	
 	int lastFrame = curtime_u() - 1;
 	double dt;
