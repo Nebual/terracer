@@ -13,6 +13,8 @@
 #include "level.h"
 #include "main.h"
 #include "player.h"
+#include "client.h"
+#include "server.h"
 
 std::string FIRSTLEVEL = "worldmap";
 int quit = 0;
@@ -39,6 +41,8 @@ int main(int argc, char *argv[]) {
 	/*==============*/
 	/*  Test Stuff  */
 	/*==============*/
+	ServerSocket *sv = new ServerSocket(5042);
+	ClientSocket *cl = new ClientSocket("192.168.0.160", "5042");
 	
 	/*PhysicsEntity *goomba = new PhysicsEntity(getTexture("goomba"), 500, 50);
 	goomba->patrolling = 1;
@@ -71,6 +75,7 @@ int main(int argc, char *argv[]) {
 		// Update
 		if(nextlevel != "") {
 			printf("Switching to level %s\n", nextlevel.c_str());
+			cl->write(Packet(0, "Switching to a new level"));
 			generateLevel(nextlevel);
 			nextlevel = "";
 		}
@@ -112,15 +117,8 @@ int main(int argc, char *argv[]) {
 		SDL_DestroyTexture(it->second.texture);
 	}
 	blockTDs.clear();
-
-	SDL_DestroyRenderer(renderer);
-	SDL_DestroyWindow(window);
 	
-	Mix_CloseAudio();
-	Mix_Quit();
-
-	IMG_Quit();
-	SDL_Quit();
+	closeWindow(window, renderer);
 	return 0;
 }
 
@@ -213,6 +211,19 @@ int initWindow(SDL_Window **window, SDL_Renderer **renderer, int argc, char *arg
 	}
 
 	SDL_RenderSetLogicalSize(*renderer, WIDTH, HEIGHT);
+	
+	return 0;
+}
+
+int closeWindow(SDL_Window *window, SDL_Renderer *renderer) {
+	SDL_DestroyRenderer(renderer);
+	SDL_DestroyWindow(window);
+	
+	Mix_CloseAudio();
+	Mix_Quit();
+	
+	IMG_Quit();
+	SDL_Quit();
 	
 	return 0;
 }

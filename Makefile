@@ -6,7 +6,7 @@ QUIET=@
 OPTIMIZATION=-O0
 
 #SOURCES=src/main.c $(wildcard src/*.c)
-SOURCES=entity.cpp player.cpp main.cpp level.cpp util.cpp common.cpp
+SOURCES=entity.cpp player.cpp main.cpp level.cpp util.cpp common.cpp client.cpp connection.cpp server.cpp
 EXTERNALSOURCES=jsoncpp.cpp
 
 CC=ccache g++
@@ -20,12 +20,14 @@ warn: EXTRACFLAGS += -Wall -Wextra
 win32: CC:=x86_64-w64-mingw32-g++
 win32: EXECUTABLE:=$(EXECUTABLE).exe
 win32: CFLAGS=-I$(WINFOLDER)include/SDL2 -Dmain=SDL_main $(EXTRACFLAGS) -Iexternals/include
-win32: LIBS=-L$(WINFOLDER)lib -lmingw32 -lSDL2main -lSDL2 $(EXTRALIBS)
+win32: LIBS=-L$(WINFOLDER)lib -lmingw32 -lSDL2main -lSDL2 $(EXTRALIBS) -lmswsock -lws2_32  $(BOOSTDIR)/lib/libboost_thread-mgw48-mt-1_55.a $(BOOSTDIR)/lib/libboost_system-mgw48-mt-1_55.a
 
 
 ifeq ($(OS),Windows_NT)
 # Building on Windows
 WINFOLDER:=C:/mingw64/x86_64-w64-mingw32/
+BOOSTDIR=C:/mingw64/boostgcc
+EXTRACFLAGS+= -I$(BOOSTDIR)/include -L$(BOOSTDIR)/lib
 
 all: win32
 win32: compile
@@ -38,7 +40,7 @@ else
 # Building on Linux
 WINFOLDER:=/usr/x86_64-w64-mingw32/
 CFLAGS=$(shell sdl2-config --cflags) $(EXTRACFLAGS) -Iexternals/include -march=native
-LIBS=$(shell sdl2-config --libs) $(EXTRALIBS)
+LIBS=$(shell sdl2-config --libs) $(EXTRALIBS) -lpthread -lboost_thread -lboost_system
 
 all: clean compile
 win32: all
@@ -94,10 +96,10 @@ zipall: all
 
 F=level
 asm:
-	$(CC) $(CFLAGS) -o $(EXECUTABLE).asm -S src/$(F).cpp $(LIBS)
+	$(CC) $(CFLAGS) -o $(EXECUTABLE).asm -S src/$(F).cpp $(LIBS) -I$(WINFOLDER)include/SDL2 -Dmain=SDL_main $(EXTRACFLAGS) -Iexternals/include
 	meld $(EXECUTABLE).asm $(EXECUTABLE)_2.asm
 asm2:
-	$(CC) $(CFLAGS) -o $(EXECUTABLE)_2.asm -S src/$(F).cpp $(LIBS)
+	$(CC) $(CFLAGS) -o $(EXECUTABLE)_2.asm -S src/$(F).cpp $(LIBS) -I$(WINFOLDER)include/SDL2 -Dmain=SDL_main $(EXTRACFLAGS) -Iexternals/include
 asm3:
 	$(CC) $(CFLAGS) -o $(EXECUTABLE)_3.asm -S src/$(F).cpp $(LIBS)
 	meld $(EXECUTABLE).asm $(EXECUTABLE)_2.asm $(EXECTUABLE)_3.asm
