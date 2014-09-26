@@ -20,7 +20,7 @@
 
 std::map <std::string, TextureData> blockTDs;
 
-TextureData& getTexture(std::string k) {
+TextureData& getTexture(const std::string k) {
 	if(blockTDs.count(k) != 0) return blockTDs.at(k);
 	blockTDs[k] = TextureDataCreate(("res/" + k + ".png").c_str());
 	//SDL_SetTextureBlendMode(blockTDs[k].texture, SDL_BLENDMODE_NONE);

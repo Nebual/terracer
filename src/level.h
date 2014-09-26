@@ -9,7 +9,7 @@ struct Level {
 	std::string id;
 	Json::Value *json;
 	Level();
-	Level(std::string inLevel, Json::Value *json);
+	Level(const std::string inLevel, Json::Value *json);
 };
 
 struct WorldTip : Drawable {
@@ -19,15 +19,13 @@ struct WorldTip : Drawable {
 	void Draw(double dt);
 };
 
-extern std::vector<WorldTip*> worldtips; 
-extern char menuMode[];
+extern std::vector<WorldTip*> worldtips;
 extern SDL_Texture *backgroundRLTexture;
 extern Entity* posLookup[100][100];
 
-void checkWinLoss();
 void cleanLevel();
-void generateLevel(std::string &level);
-bool loadJSONLevel(std::string &level, Json::Value &root);
+void generateLevel(const std::string &level);
+bool loadJSONLevel(const std::string &level, Json::Value &root);
 void drawBackground(SDL_Renderer *renderer, double dt);
 void compileBackground(SDL_Renderer *renderer);
 void drawHud(double dt);

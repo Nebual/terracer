@@ -72,18 +72,6 @@ void Player::HandleKeyboard(double dt) {
 						Entity::GC();
 						if(DEBUG) printf(", new entsC: %d\n", entsC);
 						break;
-					case SDLK_n:
-						if(menuMode[0] != '\0'){
-							quit = 1;
-							return;
-						}
-						break;
-					case SDLK_y:
-						if(menuMode[0] != '\0'){
-							generateLevel(curLevel->id);
-							return;
-						}
-						break;
 					case SDLK_SPACE:
 						if(ply->onGround) {
 							playSound(jumpSounds[rand() % 5]);

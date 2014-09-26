@@ -81,10 +81,6 @@ int main(int argc, char *argv[]) {
 		}
 		
 		// ====================
-		// Win/Loss conditions
-		checkWinLoss();
-		
-		// ====================
 		// Drawing
 		for(int rli=0; rli<RL_MAX; rli++){
 			if(rli == RL_BACKGROUND) {

@@ -17,16 +17,11 @@
 
 int displayWinText;
 int displayLevelText;
-char menuMode[50];
 
 Entity* posLookup[100][100];
 SDL_Texture *backgroundRLTexture;
 
-std::vector<WorldTip*> worldtips; 
-
-void checkWinLoss(){
-	if(menuMode[0] != '\0'){return;}
-}
+std::vector<WorldTip*> worldtips;
 
 void setEntityProperties(Entity* ent, Json::Value info) {
 	if(!!info["collision"]) {ent->collision = info["collision"].asBool();}
@@ -111,7 +106,7 @@ void WorldTip::Draw(double dt) {
 }
 
 Level *curLevel;
-Level::Level(std::string inLevel, Json::Value *root) {
+Level::Level(const std::string inLevel, Json::Value *root) {
 	this->w = 0;
 	this->h = 0;
 	this->id = inLevel;
@@ -151,15 +146,14 @@ void cleanLevel() {
 	delete curLevel;
 }
 
-void generateLevel(std::string &level) {
-	strcpy(menuMode, "");
-	
+void generateLevel(const std::string &level) {
 	cleanLevel();
 
 	Json::Value root;   // will contains the root value after parsing.
 	curLevel = new Level(level, &root);
 	if(!loadJSONLevel(level, root)) {
 		printf("Error parsing JSON file for level %s!\n", level.c_str());
+		generateLevel("worldmap");
 		return; // TODO: Load from a default?
 	}
 	Json::Value tileset = root["tileset"];
@@ -171,8 +165,8 @@ void generateLevel(std::string &level) {
 	
 	FILE *fp = fopen(filename.c_str(), "r");
 	if(!fp) {
-		//printf("%s not found, you've completed the last level!\n", filename);
-		strcpy(menuMode, "YOU DEFEATED! Play again? Y/N");
+		printf("ERROR: Level %s not found!\n", filename.c_str());
+		generateLevel("worldmap");
 		return;
 	}
 	
@@ -218,7 +212,7 @@ void generateLevel(std::string &level) {
 	compileBackground(renderer);
 }
 
-bool loadJSONLevel(std::string &level, Json::Value &root) {
+bool loadJSONLevel(const std::string &level, Json::Value &root) {
 	std::string filename = ("levels/" + level + ".json");
 	if(DEBUG) printf("Reading JSON file %s\n", filename.c_str());
 	

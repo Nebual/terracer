@@ -109,7 +109,7 @@ struct Interactable : Entity{
 extern std::map <std::string, TextureData> blockTDs;
 
 void initTextures();
-TextureData& getTexture(std::string k);
+TextureData& getTexture(const std::string k);
 TextureData TextureDataCreate(const char texturePath[], const char leftPath[] = "", const char rightPath[] = "");
 Direction operator|(Direction a, Direction b);
 
