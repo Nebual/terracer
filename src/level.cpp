@@ -264,6 +264,7 @@ void handleAction(Entity* ent, Action action){
 			
 		case SCRAP_UP:
 			ply->setScrap(ply->scrapCount + 1);
+			delete ent;
 			break;
 	}
 }

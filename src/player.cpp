@@ -24,7 +24,7 @@ Player::Player(TextureData &texdata, int x, int y) : PhysicsEntity(texdata, x, y
 	this->health = 1;
 	this->scrapCount = 0;
 	for(int i=0; i<9; i++) {
-		this->collisionPoints[i].x = genericCollisionPoints[i].x * 42 + 10;
+		this->collisionPoints[i].x = genericCollisionPoints[i].x * 42 + 8;
 		this->collisionPoints[i].y = genericCollisionPoints[i].y * this->rect.h;
 	}
 }
@@ -35,7 +35,7 @@ void Player::HandleCollision(Entity* hit, Direction collideDir, double dt) {
 	}
 	if(hit->action == CRUMBLES && hit->health != 0) {
 		hit->health = 0;
-		hit->collision = 0;
+		//hit->collision = 0;
 		hit->DeathClock(1000);
 		TimerCreate(hit->id, 50, 20, [=](){
 			hit->pos.y += 2;
@@ -153,15 +153,18 @@ void Player::HandleKeyboard(double dt) {
 }
 
 void Player::interact() {
-	Vector eyePos = this->pos + Vector(this->rect.w/2, this->rect.h/2);
-
-	if(this->facing == RIGHT){
-		eyePos.x += this->rect.w;
-	}else if(this->facing == LEFT){
-		eyePos.x -= this->rect.w;
-	}
+	Interactable *closest = closestInteractable(this->pos + Vector(this->rect.w/2 - 8, this->rect.h * 0.75));
 	
-	if(Interactable *closest = closestInteractable(eyePos)) {
+	if(!closest) {
+		Vector eyePos = this->pos + Vector(this->rect.w/2 - 8, this->rect.h/2);
+		if(this->facing == RIGHT){
+			eyePos.x += this->rect.w/2;
+		}else if(this->facing == LEFT){
+			eyePos.x -= this->rect.w/2;
+		}
+		closest = closestInteractable(eyePos);
+	}
+	if(closest) {
 		closest->use();
 	}
 }

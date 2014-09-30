@@ -30,7 +30,7 @@ class Door;
 const int BLOCK_SIZE = 24;
 const int MAX_ENTITIES = 8192;
 const int MAX_COLLISION_ITERATIONS = 3;
-const int INTERACT_RANGE = 50;
+const int INTERACT_RANGE = 24;
 const int INTERACT_DISPLACEMENT = 20;
 const int MAX_HP = 5;
 

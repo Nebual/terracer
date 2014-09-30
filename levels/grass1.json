@@ -12,10 +12,16 @@
     "G": {"texture": "grass"},
     "C": {"texture": "grass", "static": false, "action": "CRUMBLES"},
     "D": {"texture": "dirt"},
-    "E": {"texture": "entity"}
+    "d": {"texture": "dirt_bg", "collision": false},
+    "t": {"texture": "wood"},
+    "E": {"texture": "entity"},
+    "M":{"texture":"metalscrap","class":"INTERACTABLE", "collision": false, "action":"SCRAP_UP"},
+    "L":{"texture":"leaves"},
+    "l":{"texture":"leaves_br"},
+    "r":{"texture":"leaves_bl"}
   },
   "entities": {
     "(1, 23)": {"action":"PLAYERSPAWN"},
-    "(79, 22)": {"action":"SWITCH_LEVEL","sdata": "3", "collision": true}
+    "(79, 9)": {"action":"SWITCH_LEVEL","sdata": "3", "collision": true}
   }
 }
