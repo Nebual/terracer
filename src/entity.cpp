@@ -140,8 +140,7 @@ void Entity::Draw(double dt) {
 }
 void Entity::Update(double dt) {
 	if(this->deathTime != 0 && this->deathTime < SDL_GetTicks()) {
-		delete this;
-		return;
+		this->kill();
 	}
 }
 
@@ -426,6 +425,7 @@ inline Direction operator|(Direction a, Direction b) {return static_cast<Directi
 /* ================= */
 
 Drawable::Drawable(RenderLayer rl) {
+	this->isKilled = false;
 	TextureData texdata = {NULL, NULL, NULL, 0, 0, 8, 0, 0, 0, CT_SQUARE};
 	this->texture = texdata.texture;
 	this->texdata = &texdata;
@@ -442,6 +442,7 @@ Drawable::Drawable(RenderLayer rl) {
 int NEXT_ENTID = 0;
 
 Drawable::Drawable(TextureData &texdata, int x, int y, RenderLayer rl) {
+	this->isKilled = false;
 	this->id = NEXT_ENTID++;
 	this->texture = texdata.texture;
 	this->texdata = &texdata;
@@ -459,6 +460,10 @@ Drawable::~Drawable() {
 	for(int i=0; i<renderLayersC[this->renderLayer]; i++) {
 		if(renderLayers[this->renderLayer][i] == this) {renderLayers[this->renderLayer][i] = NULL; break;}
 	}
+}
+
+void Drawable::kill() {
+	this->isKilled = true;
 }
 
 SDL_Rect* Drawable::GetFrame(double dt) {

@@ -18,6 +18,7 @@ struct TextureData {
 
 struct Drawable {
 	int id;
+	bool isKilled;
 	SDL_Rect rect;
 	SDL_Texture *texture;
 	TextureData *texdata;
@@ -33,6 +34,7 @@ struct Drawable {
 	~Drawable();
 	virtual SDL_Rect* GetFrame(double dt);
 	virtual void Draw(double dt);
+	void kill();
 };
 
 struct Entity : Drawable {
@@ -42,7 +44,7 @@ struct Entity : Drawable {
 	short int collisionSize;	// Used by anything involved with collisions. Define size for circle collision check 
 	short int damage;			// Projectiles
 	short int health;			// Ships
-
+	
 	Action action;
 	int iData;
 	std::string sData;

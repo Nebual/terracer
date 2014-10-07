@@ -78,6 +78,7 @@ int main(int argc, char *argv[]) {
 		for(int enti=0; enti<entsC; enti++) {
 			if(ents[enti] == NULL) continue;
 			ents[enti]->Update(dt);
+			if(ents[enti]->isKilled) delete ents[enti];
 		}
 		
 		// ====================
